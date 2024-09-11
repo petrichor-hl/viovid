@@ -51,7 +51,8 @@ class _ContentListState extends State<ContentList> {
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () {
-                    context.go('/browse/film_detail/${film.filmId}');
+                    context.go(
+                        '${GoRouterState.of(context).uri}/film_detail/${film.filmId}');
                   },
                   // onHover: (value) {},
                   child: Image(

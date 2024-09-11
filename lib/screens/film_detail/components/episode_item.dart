@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:viovid/bloc/repositories/selected_film_repo.dart';
 import 'package:viovid/models/episode.dart';
 
 class EpisodeItem extends StatelessWidget {
@@ -10,10 +13,20 @@ class EpisodeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedFilm = context.read<SelectedFilmRepo>().selectedFilm;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          context.go(
+            '${GoRouterState.of(context).uri}/episode/${episode.episodeId}/watching',
+            extra: {
+              'filmName': selectedFilm.name,
+              'seasons': selectedFilm.seasons,
+            },
+          );
+        },
         child: Row(
           children: [
             Ink(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/config/app_route.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,13 +30,16 @@ class MyApp extends StatelessWidget {
       title: 'Movie Web',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 229, 9, 21),
+          seedColor: primaryColor,
         ),
         textTheme: GoogleFonts.montserratTextTheme(),
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.black,
         sliderTheme: const SliderThemeData(
           showValueIndicator: ShowValueIndicator.always,
+          activeTrackColor: primaryColor,
+          thumbColor: primaryColor,
+          valueIndicatorColor: primaryColor,
         ),
       ),
       routerConfig: appRouter,
