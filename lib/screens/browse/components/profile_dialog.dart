@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/main.dart';
@@ -230,7 +231,7 @@ class ProfileDialog extends StatelessWidget {
                     ),
                     const Spacer(),
                     FilledButton(
-                      onPressed: () {},
+                      onPressed: () => context.go('/register-plan'),
                       style: ButtonStyle(
                         foregroundColor:
                             const WidgetStatePropertyAll(Colors.white),

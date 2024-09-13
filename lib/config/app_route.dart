@@ -10,6 +10,7 @@ import 'package:viovid/screens/auth/sign_up.dart';
 import 'package:viovid/screens/browse/browse.dart';
 import 'package:viovid/screens/film_detail/film_detail.dart';
 import 'package:viovid/screens/intro/intro.dart';
+import 'package:viovid/screens/plans/register_plan.dart';
 import 'package:viovid/screens/splash.dart';
 import 'package:viovid/screens/video_player/video_player_view.dart';
 
@@ -18,6 +19,13 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       name: 'splash',
+      redirect: (context, state) {
+        final session = supabase.auth.currentSession;
+        if (session != null) {
+          return '/browse';
+        }
+        return null;
+      },
       builder: (ctx, state) => const SplashScreen(),
     ),
     GoRoute(
@@ -25,7 +33,6 @@ GoRouter appRouter = GoRouter(
       name: 'intro',
       redirect: (context, state) {
         final session = supabase.auth.currentSession;
-
         if (session != null) {
           return '/browse';
         }
@@ -38,7 +45,6 @@ GoRouter appRouter = GoRouter(
       name: 'sign-in',
       redirect: (context, state) {
         final session = supabase.auth.currentSession;
-
         if (session != null) {
           return '/browse';
         }
@@ -112,6 +118,11 @@ GoRouter appRouter = GoRouter(
           // routes:
         ),
       ],
+    ),
+    GoRoute(
+      path: '/register-plan',
+      name: 'register-plan',
+      builder: (ctx, state) => const RegisterPlan(),
     ),
   ],
 );
