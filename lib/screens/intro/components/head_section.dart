@@ -2,9 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:viovid/base/assets.dart';
 import 'package:viovid/base/common_variables.dart';
+import 'package:viovid/screens/auth/components/sign_in_button.dart';
+import 'package:viovid/screens/auth/components/sign_up_button.dart';
 
 class HeadSection extends StatefulWidget {
   const HeadSection({super.key});
@@ -36,26 +37,9 @@ class _HeadSectionState extends State<HeadSection> {
                 fit: BoxFit.cover,
               ),
               const Spacer(),
-              FilledButton(
-                onPressed: () {
-                  // context.go('/sign-in');
-                  context.go('/sign-in');
-                },
-                style: FilledButton.styleFrom(
-                  fixedSize: const Size(170, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  backgroundColor: primaryColor,
-                ),
-                child: const Text(
-                  'Đăng nhập',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
+              const SignUpButton(),
+              const Gap(20),
+              const SignInButton(),
             ],
           ),
           const Gap(60),

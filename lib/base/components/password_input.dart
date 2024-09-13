@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 class PasswordTextField extends StatefulWidget {
   const PasswordTextField({
     super.key,
+    this.title,
     required this.passwordController,
-    required this.onEditingComplete,
+    this.onEditingComplete,
   });
+
+  final String? title;
   final TextEditingController passwordController;
-  final void Function() onEditingComplete;
+  final void Function()? onEditingComplete;
 
   @override
   State<PasswordTextField> createState() => _PasswordTextFieldState();
@@ -31,9 +34,9 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Mật khẩu',
-            style: TextStyle(
+          Text(
+            widget.title ?? 'Mật khẩu',
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

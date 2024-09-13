@@ -11,6 +11,10 @@ Future<void> main() async {
     url: 'https://kpaxjjmelbqpllxenpxz.supabase.co',
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwYXhqam1lbGJxcGxseGVucHh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MzA0NjQ5NCwiZXhwIjoyMDA4NjIyNDk0fQ.hGeExPN7h7gYiOILzPU57vSob9LC1UB-W2o6Z7WGLZs',
+    authOptions: const FlutterAuthClientOptions(
+      // authFlowType: AuthFlowType.pkce,
+      authFlowType: AuthFlowType.implicit,
+    ),
   );
   runApp(const MyApp());
   // flutter run -d chrome --web-port 5416 --web-renderer html

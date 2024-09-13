@@ -5,37 +5,44 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:viovid/base/assets.dart';
 import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/base/components/password_input.dart';
-import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/main.dart';
-import 'package:viovid/screens/auth/components/sign_up_button.dart';
+import 'package:viovid/screens/auth/components/sign_in_button.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _fullnameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  bool _isProcessing = false;
+  final _confirmPasswordController = TextEditingController();
 
   String _errorText = '';
-
+  bool _isProcessing = false;
   void _submit() async {
     // check
+    final endteredFullname = _fullnameController.text;
     final enteredEmail = _emailController.text;
     final enteredPassword = _passwordController.text;
+    final enteredConfirmPassword = _confirmPasswordController.text;
 
     _errorText = '';
-    if (enteredEmail.isEmpty) {
-      _errorText = 'Bạn chưa điền Email đăng nhập';
+    if (endteredFullname.isEmpty) {
+      _errorText = 'Bạn chưa nhập Họ và Tên';
+    } else if (enteredEmail.isEmpty) {
+      _errorText = 'Bạn chưa nhập Email đăng nhập';
     } else if (enteredPassword.isEmpty) {
       _errorText = 'Bạn chưa nhập Mật khẩu';
+    } else if (enteredConfirmPassword.isEmpty) {
+      _errorText = 'Bạn chưa Xác nhận Mật khẩu';
     } else if (enteredPassword.length < 6) {
       _errorText = 'Mật khẩu có ít nhất 6 ký tự';
+    } else if (enteredPassword != enteredConfirmPassword) {
+      _errorText = 'Xác nhận mật khẩu không chính xác';
     }
 
     if (_errorText.isNotEmpty) {
@@ -48,54 +55,44 @@ class _SignInScreenState extends State<SignInScreen> {
     });
 
     try {
-      final authRes = await supabase.auth.signInWithPassword(
-        email: enteredEmail,
-        password: enteredPassword,
-      );
+      final List<Map<String, dynamic>> checkDuplicate = await supabase
+          .from('profile')
+          .select('email')
+          .eq('email', enteredEmail);
 
-      if (authRes.session != null) {
-        // await fetchTopicsData();
-        await fetchProfileData();
+      if (checkDuplicate.isEmpty) {
+        await supabase.auth.signUp(
+          email: enteredEmail,
+          password: enteredPassword,
+          emailRedirectTo: 'http://localhost:5416/#/confirmed-sign-up',
+          data: {
+            'email': enteredEmail,
+            'password': enteredPassword,
+            'full_name': endteredFullname,
+            'dob': '01/05/2003',
+            'avatar_url': 'default_avt.png',
+          },
+        );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Center(
-                child: Text(
-                  'Đăng nhập thành công.',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
+              content: Text('Xác thực Email trong Hộp thư đến.'),
               behavior: SnackBarBehavior.floating,
-              duration: Duration(seconds: 4),
-              width: 300,
             ),
           );
-
-          context.go('/browse');
         }
+      } else {
+        _errorText = 'Email đã được đăng ký. Vui lòng sử dụng Email khác';
       }
     } on AuthException catch (error) {
       if (mounted) {
-        // print(error.message);
-        if (error.message == "Invalid login credentials") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Tên đăng nhập hoặc mật khẩu sai'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(error.message),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-        setState(() {
-          _isProcessing = false;
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     } catch (error) {
       if (mounted) {
@@ -105,26 +102,12 @@ class _SignInScreenState extends State<SignInScreen> {
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
-        setState(() {
-          _isProcessing = false;
-        });
       }
+    } finally {
+      setState(() {
+        _isProcessing = false;
+      });
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (supabase.auth.currentSession != null) {
-      context.go('/browse');
-    }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -144,14 +127,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const Spacer(),
                 const Text(
-                  'Bạn mới sử dụng VioVid?',
+                  'Bạn đã có tài khoản?',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
                 ),
                 const Gap(10),
-                const SignUpButton(),
+                const SignInButton(),
               ],
             ),
           ),
@@ -167,13 +150,50 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Đăng nhập',
+                    'Đăng ký tài khoản',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 28,
                     ),
                   ),
                   const Gap(24),
+                  Ink(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black, // Màu sắc của border
+                        width: 1, // Độ rộng của border
+                      ),
+                      borderRadius:
+                          BorderRadius.circular(10), // Bán kính của border
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Họ và Tên',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        TextField(
+                          controller: _fullnameController,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            hintText: 'Tran Van A',
+                            hintStyle: TextStyle(color: Color(0xFFACACAC)),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.fromLTRB(0, 8, 0, 8),
+                            isCollapsed: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Gap(14),
                   Ink(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -213,18 +233,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   const Gap(14),
                   PasswordTextField(
                     passwordController: _passwordController,
-                    onEditingComplete: _submit,
                   ),
-                  const Gap(10),
-                  InkWell(
-                    onTap: () {},
-                    child: const Text(
-                      'Quên mật khẩu',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                  const Gap(14),
+                  PasswordTextField(
+                    title: 'Xác nhận mật khẩu',
+                    passwordController: _confirmPasswordController,
+                    onEditingComplete: _submit,
                   ),
                   const Gap(20),
                   Align(
@@ -256,7 +270,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               backgroundColor: primaryColor,
                             ),
                             child: const Text(
-                              'Đăng nhập',
+                              'Đăng ký',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
