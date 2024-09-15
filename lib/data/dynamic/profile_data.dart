@@ -6,7 +6,7 @@ Future<void> fetchProfileData() async {
   final userId = supabase.auth.currentUser!.id;
   final data = await supabase
       .from('profile')
-      .select('password, full_name, dob, avatar_url, my_list')
+      .select('full_name, avatar_url, dob, my_list, password, role')
       .eq('id', userId)
       .single();
 
@@ -20,8 +20,16 @@ Future<void> fetchProfileData() async {
       'dob': data['dob'],
       'avatar_url': data['avatar_url'],
       'my_list': myList,
+      'role': data['role'],
     },
   );
 
   // print('My List: ${profileData['my_list']}');
+}
+
+Future<String> getRole() async {
+  if (profileData.isEmpty) {
+    await fetchProfileData();
+  }
+  return profileData['role'];
 }

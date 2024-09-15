@@ -54,7 +54,6 @@ class _SignInScreenState extends State<SignInScreen> {
       );
 
       if (authRes.session != null) {
-        // await fetchTopicsData();
         await fetchProfileData();
 
         if (mounted) {
@@ -72,7 +71,11 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           );
 
-          context.go('/browse');
+          if (profileData['role'] == 'end-user') {
+            context.go('/browse');
+          } else if (profileData['role'] == 'admin') {
+            context.go('/admin/dashboard');
+          }
         }
       }
     } on AuthException catch (error) {

@@ -16,16 +16,6 @@ class BrowseHeader extends StatefulWidget {
 class _BrowseHeaderState extends State<BrowseHeader> {
   bool _isMuted = true;
 
-  //
-  // late final VideoPlayerController _videoController = VideoPlayerController.networkUrl(
-  //   Uri.parse(
-  //     Assets.violetEvergardenOnlineVideoUrl,
-  //   ),
-  // )
-  //   ..initialize().then((_) => setState(() {}))
-  //   ..setVolume(0)
-  //   ..play();
-
   late final VideoPlayerController _videoController =
       VideoPlayerController.asset(
     Assets.violetEvergardenOfflineVideoUrl,

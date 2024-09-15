@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/bloc/cubits/video_state_cubit.dart';
 import 'package:viovid/bloc/repositories/selected_film_repo.dart';
+import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/main.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:viovid/screens/admin/_layout/admin_layout.dart';
+import 'package:viovid/screens/admin/account-management/account_management.dart';
+import 'package:viovid/screens/admin/dashboard/dashboard.dart';
+import 'package:viovid/screens/admin/film_management/film_management.dart';
+import 'package:viovid/screens/admin/plan-management/plan_management.dart';
+import 'package:viovid/screens/admin/topic_management/topic_management.dart';
 import 'package:viovid/screens/auth/confirmed_sign_up.dart';
 import 'package:viovid/screens/auth/sign_in.dart';
 import 'package:viovid/screens/auth/sign_up.dart';
@@ -19,10 +26,10 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/',
       name: 'splash',
-      redirect: (context, state) {
+      redirect: (context, state) async {
         final session = supabase.auth.currentSession;
         if (session != null) {
-          return '/browse';
+          return await getRole() == 'end-user' ? '/browse' : '/admin/dashboard';
         }
         return null;
       },
@@ -31,10 +38,10 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/intro',
       name: 'intro',
-      redirect: (context, state) {
+      redirect: (context, state) async {
         final session = supabase.auth.currentSession;
         if (session != null) {
-          return '/browse';
+          return await getRole() == 'end-user' ? '/browse' : '/admin/dashboard';
         }
         return null;
       },
@@ -43,10 +50,10 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/sign-in',
       name: 'sign-in',
-      redirect: (context, state) {
+      redirect: (context, state) async {
         final session = supabase.auth.currentSession;
         if (session != null) {
-          return '/browse';
+          return await getRole() == 'end-user' ? '/browse' : '/admin/dashboard';
         }
         return null;
       },
@@ -55,6 +62,13 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/sign-up',
       name: 'sign-up',
+      redirect: (context, state) async {
+        final session = supabase.auth.currentSession;
+        if (session != null) {
+          return await getRole() == 'end-user' ? '/browse' : '/admin/dashboard';
+        }
+        return null;
+      },
       builder: (ctx, state) => const SignUpScreen(),
     ),
     GoRoute(
@@ -78,10 +92,14 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/browse',
       name: 'browse',
-      redirect: (context, state) {
+      redirect: (context, state) async {
         final session = supabase.auth.currentSession;
         if (session == null) {
           return '/intro';
+        } else {
+          if (await getRole() == 'admin') {
+            return '/admin/dashboard';
+          }
         }
         return null;
       },
@@ -123,6 +141,45 @@ GoRouter appRouter = GoRouter(
       path: '/register-plan',
       name: 'register-plan',
       builder: (ctx, state) => const RegisterPlan(),
+    ),
+    ShellRoute(
+      builder: (context, state, child) {
+        return AdminLayout(child: child);
+      },
+      routes: [
+        GoRoute(
+          path: '/admin',
+          name: 'admin',
+          redirect: (context, state) {
+            return '/admin/dashboard';
+          },
+        ),
+        GoRoute(
+          path: '/admin/dashboard',
+          name: 'dashboard',
+          builder: (context, state) => const DashboardScreen(),
+        ),
+        GoRoute(
+          path: '/admin/plan-management',
+          name: 'plan-management',
+          builder: (context, state) => const PlanManagementScreen(),
+        ),
+        GoRoute(
+          path: '/admin/film-management',
+          name: 'film-management',
+          builder: (context, state) => const FilmManagementScreen(),
+        ),
+        GoRoute(
+          path: '/admin/topic-management',
+          name: 'topic-management',
+          builder: (context, state) => const TopicManagementScreen(),
+        ),
+        GoRoute(
+          path: '/admin/account-management',
+          name: 'account-management',
+          builder: (context, state) => const AccountManagementScreen(),
+        ),
+      ],
     ),
   ],
 );
