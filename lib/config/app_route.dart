@@ -140,6 +140,24 @@ GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/register-plan',
       name: 'register-plan',
+      redirect: (context, state) async {
+        final session = supabase.auth.currentSession;
+        if (session != null) {
+          final userRole = await getRole();
+          if (userRole == 'admin') {
+            return '/admin/dashboard';
+          } else {
+            bool isNormalUser = profileData['end_date'] == null ||
+                (profileData['end_date'] != null &&
+                    DateTime.tryParse(profileData['end_date']) != null &&
+                    DateTime.parse(profileData['end_date'])
+                        .isBefore(DateTime.now()));
+            return isNormalUser ? null : '/browse';
+          }
+        }
+
+        return '/intro';
+      },
       builder: (ctx, state) => const RegisterPlan(),
     ),
     ShellRoute(
