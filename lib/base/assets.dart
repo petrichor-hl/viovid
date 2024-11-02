@@ -55,6 +55,8 @@ class Assets {
 
   static const String witcher = '${_images}witcher.jpg';
 
+  static const String rubySparkles = '${_images}ruby_sparkles.png';
+
   // ICON
   static const String _icons = 'assets/icons/';
   static const String userIcon = '${_icons}user-solid.svg';
