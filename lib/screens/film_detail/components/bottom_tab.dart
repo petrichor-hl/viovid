@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
@@ -45,16 +46,21 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   late final _futureCrewData = _fetchCrewData();
 
   Future<void> _fetchRecommendFilms() async {
-    String type = widget.isMovie ? 'movie' : 'tv';
+    // String type = widget.isMovie ? 'movie' : 'tv';
     String url =
-        "https://api.themoviedb.org/3/$type/${widget.filmId}/recommendations?api_key=$tmdbApiKey";
-    final response = await http.get(Uri.parse(url));
+        "https://film-filter.onrender.com/recommend-custom?movie_id=${widget.filmId}";
+    final response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
     if (response.statusCode == 200) {
       // Parse the response JSON
       // print('Response: ${response.body}');
       Map<String, dynamic> data = json.decode(response.body);
 
-      List<dynamic> results = data['results'];
+      List<dynamic> results = data['recommendations'];
 
       for (var i = 0; i < results.length; ++i) {
         if (results[i]['poster_path'] == null) {
@@ -63,7 +69,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
         _recommendFilms.add(
           Poster(
             filmId: results[i]['id'].toString(),
-            posterPath: results[i]['poster_path'],
+            posterPath: results[i]['poster_path'][0],
           ),
         );
       }
