@@ -125,15 +125,16 @@ class ProfileDialog extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            Positioned(
-                              bottom: -5,
-                              right: -5,
-                              child: Image.asset(
-                                Assets.rubySparkles,
-                                width: 50,
-                                height: 50,
-                              ),
-                            )
+                            if (!isNormalUser)
+                              Positioned(
+                                bottom: -5,
+                                right: -5,
+                                child: Image.asset(
+                                  Assets.rubySparkles,
+                                  width: 50,
+                                  height: 50,
+                                ),
+                              )
                           ],
                         ),
                       );

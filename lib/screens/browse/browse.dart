@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/data/dynamic/topics_data.dart';
 import 'package:viovid/screens/browse/components/browse_header.dart';
+import 'package:viovid/screens/browse/components/chat_bot_dialog.dart';
 import 'package:viovid/screens/browse/components/content_list.dart';
 import 'package:viovid/screens/browse/components/custom_app_bar.dart';
 
@@ -20,7 +21,9 @@ class _BrowseScreenState extends State<BrowseScreen> {
       setState(() {});
     });
 
-  bool isFetchingData = true;
+  bool _isFetchingData = true;
+
+  bool _isChatDialogVisible = false;
 
   Future<void> fetchData() async {
     await fetchTopicsData();
@@ -32,7 +35,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
     }
 
     setState(() {
-      isFetchingData = false;
+      _isFetchingData = false;
     });
   }
 
@@ -52,7 +55,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return isFetchingData
+    return _isFetchingData
         ? const ColoredBox(
             color: Colors.black,
           )
@@ -65,24 +68,49 @@ class _BrowseScreenState extends State<BrowseScreen> {
                     _scrollController.hasClients ? _scrollController.offset : 0,
               ),
             ),
-            body: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                const SliverToBoxAdapter(
-                  child: BrowseHeader(),
-                ),
-                ...topicsData.map(
-                  (topic) => SliverToBoxAdapter(
-                    child: ContentList(
-                      key: PageStorageKey(topic),
-                      title: topic.name,
-                      films: topic.posters,
-                      isOriginals: topic.name == 'Chỉ có trên VioVid',
+            body: Stack(
+              children: [
+                CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    const SliverToBoxAdapter(
+                      child: BrowseHeader(),
                     ),
-                  ),
+                    ...topicsData.map(
+                      (topic) => SliverToBoxAdapter(
+                        child: ContentList(
+                          key: PageStorageKey(topic),
+                          title: topic.name,
+                          films: topic.posters,
+                          isOriginals: topic.name == 'Chỉ có trên VioVid',
+                        ),
+                      ),
+                    ),
+                    const SliverPadding(padding: EdgeInsets.only(bottom: 20))
+                  ],
                 ),
-                const SliverPadding(padding: EdgeInsets.only(bottom: 20))
+                Positioned(
+                    bottom: 16,
+                    right: 80,
+                    child: IgnorePointer(
+                      ignoring: !_isChatDialogVisible,
+                      child: AnimatedOpacity(
+                        opacity: _isChatDialogVisible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: ChatBotDialog(
+                          minimizeDialog: () => setState(() {
+                            _isChatDialogVisible = false;
+                          }),
+                        ),
+                      ),
+                    )),
               ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => setState(() {
+                _isChatDialogVisible = !_isChatDialogVisible;
+              }),
+              child: const Icon(Icons.smart_toy_rounded),
             ),
           );
   }

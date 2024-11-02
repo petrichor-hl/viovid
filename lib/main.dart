@@ -9,15 +9,14 @@ Future<void> main() async {
 
   await Supabase.initialize(
     url: 'https://kpaxjjmelbqpllxenpxz.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwYXhqam1lbGJxcGxseGVucHh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5MzA0NjQ5NCwiZXhwIjoyMDA4NjIyNDk0fQ.hGeExPN7h7gYiOILzPU57vSob9LC1UB-W2o6Z7WGLZs',
+    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
     authOptions: const FlutterAuthClientOptions(
       // authFlowType: AuthFlowType.pkce,
       authFlowType: AuthFlowType.implicit,
     ),
   );
   runApp(const MyApp());
-  // flutter run -d chrome --web-port 5416 --web-renderer html
+  // flutter run -d chrome --web-port 5416 --web-renderer html --dart-define-from-file=lib/config/.env
 }
 
 final supabase = Supabase.instance.client;
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Movie Web',
+      title: 'VioVid',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: primaryColor,
