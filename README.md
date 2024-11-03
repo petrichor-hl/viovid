@@ -29,3 +29,8 @@ SE121.011
 <p align="center">
     <img src="demo/home_screen.png" />
 </p>
+
+- OpenAI Chat Bot 🤖
+<p align="center">
+    <img src="demo/openai_chat_bot.png" />
+</p>

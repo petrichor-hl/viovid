@@ -1,3 +1,4 @@
+import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/material.dart';
 import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/config/app_route.dart';
@@ -15,14 +16,16 @@ Future<void> main() async {
       authFlowType: AuthFlowType.implicit,
     ),
   );
+
+  OpenAI.apiKey = const String.fromEnvironment('OPEN_AI_API_KEY');
+
   runApp(const MyApp());
   // flutter run -d chrome --web-port 5416 --web-renderer html --dart-define-from-file=lib/config/.env
 }
 
 final supabase = Supabase.instance.client;
-const tmdbApiKey = 'a29284b32c092cc59805c9f5513d3811';
-const baseAvatarUrl =
-    'https://kpaxjjmelbqpllxenpxz.supabase.co/storage/v1/object/public/avatar/';
+const tmdbApiKey = String.fromEnvironment('TMDB_API_KEY');
+const baseAvatarUrl = 'https://kpaxjjmelbqpllxenpxz.supabase.co/storage/v1/object/public/avatar/';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

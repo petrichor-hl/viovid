@@ -64,8 +64,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
             appBar: PreferredSize(
               preferredSize: Size(_screenSize.width, 100),
               child: CustomAppBar(
-                scrollOffset:
-                    _scrollController.hasClients ? _scrollController.offset : 0,
+                scrollOffset: _scrollController.hasClients ? _scrollController.offset : 0,
               ),
             ),
             body: Stack(
@@ -96,7 +95,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
                       ignoring: !_isChatDialogVisible,
                       child: AnimatedOpacity(
                         opacity: _isChatDialogVisible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 150),
                         child: ChatBotDialog(
                           minimizeDialog: () => setState(() {
                             _isChatDialogVisible = false;

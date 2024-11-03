@@ -49,6 +49,7 @@ dependencies:
   http: ^1.2.2
   image_picker_for_web: ^3.0.5
   web: ^1.0.0
+  dart_openai: ^5.1.0
 
 dev_dependencies:
   flutter_test:
