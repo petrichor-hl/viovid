@@ -26,11 +26,12 @@ SE121.011
 ### Screenshots
 
 - Home
-<p align="center">
+<p >
     <img src="demo/home_screen.png" />
 </p>
 
 - OpenAI Chat Bot 🤖
 <p align="center">
-    <img src="demo/openai_chat_bot.png" />
+    <img src="demo/openai_chat_bot_0.png" width="40%" hspace='10'/>
+    <img src="demo/openai_chat_bot_1.png" width="38.7%" hspace='10'/>
 </p>

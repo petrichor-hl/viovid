@@ -17,12 +17,13 @@ Future<void> main() async {
     ),
   );
 
-  OpenAI.apiKey = const String.fromEnvironment('OPEN_AI_API_KEY');
+  OpenAI.apiKey = openAIApiKey;
 
   runApp(const MyApp());
   // flutter run -d chrome --web-port 5416 --web-renderer html --dart-define-from-file=lib/config/.env
 }
 
+const openAIApiKey = String.fromEnvironment('OPEN_AI_API_KEY');
 final supabase = Supabase.instance.client;
 const tmdbApiKey = String.fromEnvironment('TMDB_API_KEY');
 const baseAvatarUrl = 'https://kpaxjjmelbqpllxenpxz.supabase.co/storage/v1/object/public/avatar/';
