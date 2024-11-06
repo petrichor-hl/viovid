@@ -69,7 +69,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
         _recommendFilms.add(
           Poster(
             filmId: results[i]['id'].toString(),
-            posterPath: results[i]['poster_path'][0],
+            posterPath: results[i]['poster_path'][0].toString(),
           ),
         );
       }
