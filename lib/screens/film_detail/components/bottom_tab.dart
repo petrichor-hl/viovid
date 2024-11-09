@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:http/http.dart' as http;
 import 'package:viovid/base/common_variables.dart';
+import 'package:viovid/bloc/repositories/selected_film_repo.dart';
 import 'package:viovid/main.dart';
 import 'package:viovid/models/episode.dart';
 import 'package:viovid/models/poster.dart';
@@ -11,6 +13,7 @@ import 'package:viovid/screens/film_detail/components/grid_films.dart';
 import 'package:viovid/screens/film_detail/components/grid_persons.dart';
 import 'package:viovid/screens/film_detail/components/grid_shimmer.dart';
 import 'package:viovid/screens/film_detail/components/review_input.dart';
+import 'package:viovid/screens/film_detail/components/review_item.dart';
 
 class BottomTab extends StatefulWidget {
   const BottomTab({
@@ -32,12 +35,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   late final TabController _tabController;
   int _tabIndex = 0;
 
-  // late final _listEpisodes = ListEpisodes(widget.episode);
-
   final _gridShimmer = const GridShimmer();
-
-  final List<Poster> _recommendFilms = [];
-  late final _futureRecommendFilms = _fetchRecommendFilms();
 
   late final List<dynamic> _castData;
   late final _futureCastData = _fetchCastData();
@@ -45,32 +43,8 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   late final List<dynamic> _crewData;
   late final _futureCrewData = _fetchCrewData();
 
-  Future<void> _fetchRecommendFilms() async {
-    String type = widget.isMovie ? 'movie' : 'tv';
-    String url = "https://api.themoviedb.org/3/$type/${widget.filmId}/recommendations?api_key=$tmdbApiKey";
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      // Parse the response JSON
-      // print('Response: ${response.body}');
-      Map<String, dynamic> data = json.decode(response.body);
-
-      List<dynamic> results = data['results'];
-
-      for (var i = 0; i < results.length; ++i) {
-        if (results[i]['poster_path'] == null) {
-          continue;
-        }
-        _recommendFilms.add(
-          Poster(
-            filmId: results[i]['id'].toString(),
-            posterPath: results[i]['poster_path'],
-          ),
-        );
-      }
-    } else {
-      print('Error: ${response.statusCode}');
-    }
-  }
+  final List<Poster> _recommendFilms = [];
+  late final _futureRecommendFilms = _fetchRecommendFilms();
 
   Future<void> _fetchCastData() async {
     _castData = await supabase.from('cast').select('role: character, person(id, name, profile_path, popularity)').eq('film_id', widget.filmId);
@@ -105,6 +79,33 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
     // print('crews = ' + crews);
   }
 
+  Future<void> _fetchRecommendFilms() async {
+    String type = widget.isMovie ? 'movie' : 'tv';
+    String url = "https://api.themoviedb.org/3/$type/${widget.filmId}/recommendations?api_key=$tmdbApiKey";
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // Parse the response JSON
+      // print('Response: ${response.body}');
+      Map<String, dynamic> data = json.decode(response.body);
+
+      List<dynamic> results = data['results'];
+
+      for (var i = 0; i < results.length; ++i) {
+        if (results[i]['poster_path'] == null) {
+          continue;
+        }
+        _recommendFilms.add(
+          Poster(
+            filmId: results[i]['id'].toString(),
+            posterPath: results[i]['poster_path'],
+          ),
+        );
+      }
+    } else {
+      print('Error: ${response.statusCode}');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -129,6 +130,9 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final reviews = context.read<SelectedFilmRepo>().selectedFilm.reviews.where(
+          (review) => review.userId != supabase.auth.currentUser?.id,
+        );
     return Column(
       children: [
         TabBar(
@@ -163,16 +167,16 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
                 text: 'Tập phim',
               ),
             const Tab(
-              text: 'Diễn viên',
-            ),
-            const Tab(
-              text: 'Đội ngũ',
+              text: 'Đánh giá',
             ),
             const Tab(
               text: 'Đề xuất',
             ),
             const Tab(
-              text: 'Review',
+              text: 'Diễn viên',
+            ),
+            const Tab(
+              text: 'Đội ngũ',
             ),
           ],
         ),
@@ -183,46 +187,48 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
             0 => Column(
                 children: widget.episodes.map((episode) => EpisodeItem(episode: episode)).toList(),
               ),
-            1 => FutureBuilder(
-                future: _futureCastData,
-                builder: (ctx, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _gridShimmer;
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Text(
-                      'Truy xuất thông tin Diễn viên thất bại',
-                      style: TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    );
-                  }
-
-                  return GridPersons(personsData: _castData);
-                },
+            1 => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Đánh giá của bạn:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Gap(10),
+                  const ReviewInput(),
+                  const Gap(8),
+                  const Divider(
+                    color: Colors.white30,
+                  ),
+                  const Gap(20),
+                  const Text(
+                    'Đánh giá của mọi người:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Gap(10),
+                  ...reviews.map(
+                    (review) => ReviewItem(review: review),
+                  ),
+                  if (reviews.isEmpty)
+                    const Text(
+                      'Chưa có',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white38,
+                      ),
+                    ),
+                ],
               ),
             2 => FutureBuilder(
-                future: _futureCrewData,
-                builder: (ctx, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _gridShimmer;
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Text(
-                      'Truy xuất thông tin Đội ngũ thất bại',
-                      style: TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    );
-                  }
-
-                  return GridPersons(
-                    personsData: _crewData,
-                    isCast: false,
-                  );
-                },
-              ),
-            3 => FutureBuilder(
                 future: _futureRecommendFilms,
                 builder: (ctx, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -243,32 +249,44 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
                   );
                 },
               ),
-            4 => const Column(
-                // crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ReviewInput()
-                  // FutureBuilder(
-                  //   future: _futureRecommendFilms,
-                  //   builder: (ctx, snapshot) {
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       return _gridShimmer;
-                  //     }
+            3 => FutureBuilder(
+                future: _futureCastData,
+                builder: (ctx, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return _gridShimmer;
+                  }
 
-                  //     if (snapshot.hasError) {
-                  //       return const Text(
-                  //         'Truy xuất thông tin Đề xuất thất bại',
-                  //         style: TextStyle(color: Colors.white),
-                  //         textAlign: TextAlign.center,
-                  //       );
-                  //     }
+                  if (snapshot.hasError) {
+                    return const Text(
+                      'Truy xuất thông tin Diễn viên thất bại',
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    );
+                  }
 
-                  //     return GridFilms(
-                  //       posters: _recommendFilms,
-                  //       canClick: false,
-                  //     );
-                  //   },
-                  // ),
-                ],
+                  return GridPersons(personsData: _castData);
+                },
+              ),
+            4 => FutureBuilder(
+                future: _futureCrewData,
+                builder: (ctx, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return _gridShimmer;
+                  }
+
+                  if (snapshot.hasError) {
+                    return const Text(
+                      'Truy xuất thông tin Đội ngũ thất bại',
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    );
+                  }
+
+                  return GridPersons(
+                    personsData: _crewData,
+                    isCast: false,
+                  );
+                },
               ),
             _ => null,
           },

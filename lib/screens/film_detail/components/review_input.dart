@@ -157,15 +157,6 @@ class _ReviewInputState extends State<ReviewInput> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // RatingBarIndicator(
-              //   rating: 3,
-              //   itemBuilder: (context, index) => const Icon(
-              //     Icons.star,
-              //     color: Colors.amber,
-              //   ),
-              //   itemCount: 5,
-              //   itemSize: 50.0,
-              // ),
               RatingBar.builder(
                 initialRating: _rate,
                 minRating: 1,
