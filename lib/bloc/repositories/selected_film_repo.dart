@@ -37,10 +37,7 @@ class SelectedFilmRepo {
     );
 
     // print('backdrop_path = ${_film!['backdrop_path']}');
-    final List<dynamic> genresData = await supabase
-        .from('film_genre')
-        .select('genre(*)')
-        .eq('film_id', filmId);
+    final List<dynamic> genresData = await supabase.from('film_genre').select('genre(*)').eq('film_id', filmId);
 
     for (var genreRow in genresData) {
       selectedFilm.genres.add(
@@ -53,12 +50,8 @@ class SelectedFilmRepo {
 
     // print(_film.genres.length);
 
-    final List<dynamic> seasonsData = await supabase
-        .from('season')
-        .select('id, name, episode(*)')
-        .eq('film_id', filmId)
-        .order('id', ascending: true)
-        .order('order', referencedTable: 'episode', ascending: true);
+    final List<dynamic> seasonsData =
+        await supabase.from('season').select('id, name, episode(*)').eq('film_id', filmId).order('id', ascending: true).order('order', referencedTable: 'episode', ascending: true);
 
     for (var seasonRow in seasonsData) {
       final season = Season(
@@ -88,10 +81,7 @@ class SelectedFilmRepo {
     }
     // print(_film.seasons.length);
 
-    final List<dynamic> reviewsData = await supabase
-        .from('review')
-        .select('user_id, star, created_at, profile(full_name, avatar_url)')
-        .eq('film_id', filmId);
+    final List<dynamic> reviewsData = await supabase.from('review').select('user_id, star, content, created_at, profile(full_name, avatar_url)').eq('film_id', filmId);
 
     // print(reviewsData);
 
@@ -102,6 +92,7 @@ class SelectedFilmRepo {
           hoTen: element['profile']['full_name'],
           avatarUrl: element['profile']['avatar_url'],
           star: element['star'],
+          content: element['content'],
           createAt: vnDateFormat.parse(element['created_at']),
         ),
       );

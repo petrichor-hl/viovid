@@ -10,6 +10,7 @@ import 'package:viovid/screens/film_detail/components/episode_item.dart';
 import 'package:viovid/screens/film_detail/components/grid_films.dart';
 import 'package:viovid/screens/film_detail/components/grid_persons.dart';
 import 'package:viovid/screens/film_detail/components/grid_shimmer.dart';
+import 'package:viovid/screens/film_detail/components/review_input.dart';
 
 class BottomTab extends StatefulWidget {
   const BottomTab({
@@ -46,8 +47,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
 
   Future<void> _fetchRecommendFilms() async {
     String type = widget.isMovie ? 'movie' : 'tv';
-    String url =
-        "https://api.themoviedb.org/3/$type/${widget.filmId}/recommendations?api_key=$tmdbApiKey";
+    String url = "https://api.themoviedb.org/3/$type/${widget.filmId}/recommendations?api_key=$tmdbApiKey";
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       // Parse the response JSON
@@ -73,13 +73,9 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchCastData() async {
-    _castData = await supabase
-        .from('cast')
-        .select('role: character, person(id, name, profile_path, popularity)')
-        .eq('film_id', widget.filmId);
+    _castData = await supabase.from('cast').select('role: character, person(id, name, profile_path, popularity)').eq('film_id', widget.filmId);
 
-    _castData.sort((a, b) =>
-        b['person']['popularity'].compareTo(a['person']['popularity']));
+    _castData.sort((a, b) => b['person']['popularity'].compareTo(a['person']['popularity']));
 
     // String casts = '';
     // for (var element in _castData) {
@@ -97,13 +93,9 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   }
 
   Future<void> _fetchCrewData() async {
-    _crewData = await supabase
-        .from('crew')
-        .select('role: job, person(id, name, profile_path, popularity, gender)')
-        .eq('film_id', widget.filmId);
+    _crewData = await supabase.from('crew').select('role: job, person(id, name, profile_path, popularity, gender)').eq('film_id', widget.filmId);
 
-    _crewData.sort((a, b) =>
-        b['person']['popularity'].compareTo(a['person']['popularity']));
+    _crewData.sort((a, b) => b['person']['popularity'].compareTo(a['person']['popularity']));
 
     // String crews = '';
     // for (var element in _crewData) {
@@ -117,7 +109,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 3 + (widget.isMovie ? 0 : 1),
+      length: 4 + (widget.isMovie ? 0 : 1),
       vsync: this,
       initialIndex: 0,
     );
@@ -155,8 +147,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
           indicatorSize: TabBarIndicatorSize.tab,
           indicatorWeight: 4,
           indicatorColor: primaryColor,
-          splashBorderRadius:
-              const BorderRadius.vertical(top: Radius.circular(8)),
+          splashBorderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           overlayColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.hovered)) {
               return Colors.white.withOpacity(0.2);
@@ -180,6 +171,9 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
             const Tab(
               text: 'Đề xuất',
             ),
+            const Tab(
+              text: 'Review',
+            ),
           ],
         ),
         const Gap(20),
@@ -187,9 +181,7 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 100),
           child: switch (_tabIndex + (widget.isMovie ? 1 : 0)) {
             0 => Column(
-                children: widget.episodes
-                    .map((episode) => EpisodeItem(episode: episode))
-                    .toList(),
+                children: widget.episodes.map((episode) => EpisodeItem(episode: episode)).toList(),
               ),
             1 => FutureBuilder(
                 future: _futureCastData,
@@ -250,6 +242,33 @@ class _BottomTabState extends State<BottomTab> with TickerProviderStateMixin {
                     canClick: false,
                   );
                 },
+              ),
+            4 => const Column(
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ReviewInput()
+                  // FutureBuilder(
+                  //   future: _futureRecommendFilms,
+                  //   builder: (ctx, snapshot) {
+                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                  //       return _gridShimmer;
+                  //     }
+
+                  //     if (snapshot.hasError) {
+                  //       return const Text(
+                  //         'Truy xuất thông tin Đề xuất thất bại',
+                  //         style: TextStyle(color: Colors.white),
+                  //         textAlign: TextAlign.center,
+                  //       );
+                  //     }
+
+                  //     return GridFilms(
+                  //       posters: _recommendFilms,
+                  //       canClick: false,
+                  //     );
+                  //   },
+                  // ),
+                ],
               ),
             _ => null,
           },

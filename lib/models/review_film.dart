@@ -3,6 +3,7 @@ class ReviewFilm {
   String hoTen;
   String avatarUrl;
   int star;
+  String content;
   DateTime createAt;
 
   ReviewFilm({
@@ -10,6 +11,7 @@ class ReviewFilm {
     required this.hoTen,
     required this.avatarUrl,
     required this.star,
+    required this.content,
     required this.createAt,
   });
 }
