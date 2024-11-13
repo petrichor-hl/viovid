@@ -62,9 +62,7 @@ class _FilmDetailState extends State<FilmDetail> {
 
           double voteAverage = 0;
           if (selectedFilm.reviews.isNotEmpty) {
-            voteAverage = selectedFilm.reviews.fold(
-                    0, (previousValue, review) => previousValue + review.star) /
-                selectedFilm.reviews.length;
+            voteAverage = selectedFilm.reviews.fold(0, (previousValue, review) => previousValue + review.star) / selectedFilm.reviews.length;
 
             // print(voteAverage);
           }
@@ -135,8 +133,7 @@ class _FilmDetailState extends State<FilmDetail> {
                       right: 0,
                       width: 90,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 6, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
                         decoration: BoxDecoration(
                           color: const Color(0xFF696A6A).withOpacity(0.7),
                           border: const Border(
@@ -185,10 +182,7 @@ class _FilmDetailState extends State<FilmDetail> {
                           /* Nếu Film được chọn là movie, thì nó không có Season */
                           isMovie
                               ? PlayButton(
-                                  filmName: selectedFilm.name,
-                                  seasons: selectedFilm.seasons,
-                                  firstEpisodeIdToPlay: selectedFilm
-                                      .seasons[0].episodes[0].episodeId,
+                                  episode: selectedFilm.seasons[0].episodes[0],
                                 )
                               : SeasonsMenu(
                                   currentSeasonIndex: _currentSeasonIndex,
@@ -204,9 +198,7 @@ class _FilmDetailState extends State<FilmDetail> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                voteAverage == 0
-                                    ? 'Chưa có đánh giá'
-                                    : 'Điểm: ${(voteAverage * 2).toStringAsFixed(2)}',
+                                voteAverage == 0 ? 'Chưa có đánh giá' : 'Điểm: ${(voteAverage * 2).toStringAsFixed(2)}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -251,23 +243,13 @@ class _FilmDetailState extends State<FilmDetail> {
                                       onTapInside: (event) {},
                                       child: MouseRegion(
                                         cursor: SystemMouseCursors.click,
-                                        onEnter: (_) =>
-                                            setStateGenre(() => isHover = true),
-                                        onExit: (_) => setStateGenre(
-                                            () => isHover = false),
+                                        onEnter: (_) => setStateGenre(() => isHover = true),
+                                        onExit: (_) => setStateGenre(() => isHover = false),
                                         child: Text(
-                                          selectedFilm.genres[index].name +
-                                              (index ==
-                                                      selectedFilm
-                                                              .genres.length -
-                                                          1
-                                                  ? ''
-                                                  : ', '),
+                                          selectedFilm.genres[index].name + (index == selectedFilm.genres.length - 1 ? '' : ', '),
                                           style: TextStyle(
                                             color: const Color(0xFFBEBEBE),
-                                            decoration: isHover
-                                                ? TextDecoration.underline
-                                                : null,
+                                            decoration: isHover ? TextDecoration.underline : null,
                                             decorationColor: Colors.white,
                                           ),
                                         ),
@@ -307,18 +289,14 @@ class _FilmDetailState extends State<FilmDetail> {
                           }),
                           child: Text(
                             _isExpandOverview ? 'Ẩn bớt' : 'Xem thêm',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
                           ),
                         ),
                       const Gap(4),
                       BottomTab(
                         filmId: selectedFilm.id,
                         isMovie: isMovie,
-                        episodes:
-                            selectedFilm.seasons[_currentSeasonIndex].episodes,
+                        episodes: selectedFilm.seasons[_currentSeasonIndex].episodes,
                       ),
                       const Gap(20),
                     ],

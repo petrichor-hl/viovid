@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/models/season.dart';
+import 'package:viovid/bloc/repositories/selected_film_repo.dart';
+import 'package:viovid/models/episode.dart';
+import 'package:viovid/screens/film_detail/components/promote_dialog.dart';
 
 class PlayButton extends StatelessWidget {
   const PlayButton({
     super.key,
-    required this.filmName,
-    required this.seasons,
-    required this.firstEpisodeIdToPlay,
+    required this.episode,
   });
 
-  final String? filmName;
-  final List<Season>? seasons;
-  final String firstEpisodeIdToPlay;
+  final Episode episode;
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +22,18 @@ class PlayButton extends StatelessWidget {
         size: 32,
       ),
       onPressed: () {
-        context.go(
-          '${GoRouterState.of(context).uri}/episode/$firstEpisodeIdToPlay/watching',
-          extra: {
-            'filmName': filmName,
-            'seasons': seasons,
-          },
-        );
+        if (isNormalUser && !episode.isFree) {
+          showDialog(context: context, builder: (ctx) => const PromoteDialog());
+        } else {
+          final selectedFilm = context.read<SelectedFilmRepo>().selectedFilm;
+          context.go(
+            '${GoRouterState.of(context).uri}/episode/${episode.episodeId}/watching',
+            extra: {
+              'filmName': selectedFilm.name,
+              'seasons': selectedFilm.seasons,
+            },
+          );
+        }
       },
       label: const Text(
         'Phát',

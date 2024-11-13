@@ -73,6 +73,7 @@ class SelectedFilmRepo {
             runtime: episodeRow['runtime'],
             subtitle: episodeRow['subtitle'],
             linkEpisode: episodeRow['link'],
+            isFree: episodeRow['is_free'],
           ),
         );
       }

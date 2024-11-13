@@ -7,6 +7,7 @@ class Episode {
     required this.runtime,
     required this.subtitle,
     required this.linkEpisode,
+    required this.isFree,
   });
 
   final String episodeId;
@@ -16,4 +17,5 @@ class Episode {
   final int runtime;
   final String subtitle;
   final String linkEpisode;
+  final bool isFree;
 }
