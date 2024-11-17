@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 import 'package:viovid/screens/admin/account-management/account_management.dart';
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
+import 'package:viovid/screens/admin/film_management/add_film.dart';
+import 'package:viovid/screens/admin/film_management/edit_film.dart';
 import 'package:viovid/screens/admin/film_management/film_management.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
@@ -148,10 +150,7 @@ GoRouter appRouter = GoRouter(
             return '/admin/dashboard';
           } else {
             bool isNormalUser = profileData['end_date'] == null ||
-                (profileData['end_date'] != null &&
-                    DateTime.tryParse(profileData['end_date']) != null &&
-                    DateTime.parse(profileData['end_date'])
-                        .isBefore(DateTime.now()));
+                (profileData['end_date'] != null && DateTime.tryParse(profileData['end_date']) != null && DateTime.parse(profileData['end_date']).isBefore(DateTime.now()));
             return isNormalUser ? null : '/browse';
           }
         }
@@ -186,6 +185,26 @@ GoRouter appRouter = GoRouter(
           path: '/admin/film-management',
           name: 'film-management',
           builder: (context, state) => const FilmManagementScreen(),
+          routes: [
+            GoRoute(
+              path: 'add',
+              name: 'add-film',
+              builder: (context, state) => const AddFilm(),
+            ),
+            GoRoute(
+              path: 'edit/:filmId',
+              name: 'edit-film',
+              // builder: (context, state) => EditFilm(
+              //   filmId: state.pathParameters['filmId']!,
+              // ),
+              builder: (ctx, state) => RepositoryProvider(
+                create: (context) => SelectedFilmRepo(),
+                child: EditFilm(
+                  filmId: state.pathParameters['filmId']!,
+                ),
+              ),
+            )
+          ],
         ),
         GoRoute(
           path: '/admin/topic-management',

@@ -17,9 +17,9 @@ class _SideBarState extends State<SideBar> {
 
   @override
   Widget build(BuildContext context) {
-    final fullPath = GoRouterState.of(context).fullPath;
+    final fullPath = GoRouterState.of(context).fullPath!;
     return AnimatedContainer(
-      duration: Durations.medium3,
+      duration: Durations.medium2,
       width: isCollapsed ? 84 : 320,
       height: double.infinity,
       curve: Curves.fastOutSlowIn,
@@ -45,12 +45,14 @@ class _SideBarState extends State<SideBar> {
                     iconData: item['icon'],
                     text: item['text'],
                     onPress: () => context.go(item['path']),
-                    isSelected: fullPath == item['path'],
+                    isSelected: fullPath.startsWith(item['path']),
                   ),
                 ),
               ),
               const Spacer(),
-              const Divider(),
+              Divider(
+                color: const Color(0xFF695CFE).withOpacity(0.3),
+              ),
               MenuItem(
                 iconData: Icons.logout_rounded,
                 text: 'Đăng xuất',
@@ -63,8 +65,7 @@ class _SideBarState extends State<SideBar> {
                         content: Center(
                           child: Text(
                             'Hẹn sớm gặp lại bạn.',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
                         behavior: SnackBarBehavior.floating,
