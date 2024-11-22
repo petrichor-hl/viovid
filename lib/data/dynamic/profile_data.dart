@@ -6,7 +6,8 @@ Future<void> fetchProfileData() async {
   final userId = supabase.auth.currentUser!.id;
   final data = await supabase
       .from('profile')
-      .select('id, full_name, avatar_url, dob, my_list, password, role')
+      .select(
+          'id, full_name, avatar_url, dob, my_list, password, role, thread_id')
       .eq('id', userId)
       .single();
 
@@ -32,7 +33,8 @@ Future<void> fetchProfileData() async {
       'role': data['role'],
       'plan': subscription?['plan']?['name'],
       'start_date': subscription?['start_date'],
-      'end_date': subscription?['end_date']
+      'end_date': subscription?['end_date'],
+      'thread_id': data['thread_id'],
     },
   );
   // print('My List: ${profileData['my_list']}');

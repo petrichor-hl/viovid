@@ -1,7 +1,7 @@
 enum MessageType { image, text }
 
 class Message {
-  String content; // Sử dụng lớp cha cho nội dung
+  dynamic content; // String or Uint8List
   bool isUserMessage;
   MessageType type;
 

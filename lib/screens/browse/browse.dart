@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/data/dynamic/topics_data.dart';
 import 'package:viovid/screens/browse/components/browse_header.dart';
-import 'package:viovid/screens/browse/components/chat_bot_dialog.dart';
+import 'package:viovid/screens/browse/components/viovid_assistant.dart';
 import 'package:viovid/screens/browse/components/content_list.dart';
 import 'package:viovid/screens/browse/components/custom_app_bar.dart';
 
@@ -64,7 +64,8 @@ class _BrowseScreenState extends State<BrowseScreen> {
             appBar: PreferredSize(
               preferredSize: Size(_screenSize.width, 100),
               child: CustomAppBar(
-                scrollOffset: _scrollController.hasClients ? _scrollController.offset : 0,
+                scrollOffset:
+                    _scrollController.hasClients ? _scrollController.offset : 0,
               ),
             ),
             body: Stack(
@@ -96,7 +97,7 @@ class _BrowseScreenState extends State<BrowseScreen> {
                       child: AnimatedOpacity(
                         opacity: _isChatDialogVisible ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 150),
-                        child: ChatBotDialog(
+                        child: ViovidAssistantDialog(
                           minimizeDialog: () => setState(() {
                             _isChatDialogVisible = false;
                           }),
