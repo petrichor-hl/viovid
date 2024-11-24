@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/main.dart';
 import 'package:viovid/screens/admin/_layout/components/menu_item.dart';
 import 'package:viovid/screens/admin/_layout/components/sider_bar_header.dart';
@@ -17,14 +18,14 @@ class _SideBarState extends State<SideBar> {
 
   @override
   Widget build(BuildContext context) {
-    final fullPath = GoRouterState.of(context).fullPath!;
+    final fullPath = GoRouterState.of(context).fullPath;
     return AnimatedContainer(
-      duration: Durations.medium2,
+      duration: Durations.medium3,
       width: isCollapsed ? 84 : 320,
       height: double.infinity,
       curve: Curves.fastOutSlowIn,
       child: Ink(
-        color: Colors.white,
+        color: secondaryColorBg,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           child: Column(
@@ -45,14 +46,12 @@ class _SideBarState extends State<SideBar> {
                     iconData: item['icon'],
                     text: item['text'],
                     onPress: () => context.go(item['path']),
-                    isSelected: fullPath.startsWith(item['path']),
+                    isSelected: fullPath == item['path'],
                   ),
                 ),
               ),
               const Spacer(),
-              Divider(
-                color: const Color(0xFF695CFE).withOpacity(0.3),
-              ),
+              const Divider(),
               MenuItem(
                 iconData: Icons.logout_rounded,
                 text: 'Đăng xuất',
@@ -65,7 +64,8 @@ class _SideBarState extends State<SideBar> {
                         content: Center(
                           child: Text(
                             'Hẹn sớm gặp lại bạn.',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
                         behavior: SnackBarBehavior.floating,

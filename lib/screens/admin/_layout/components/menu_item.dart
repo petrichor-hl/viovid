@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:viovid/base/common_variables.dart';
 
 class MenuItem extends StatelessWidget {
   const MenuItem({
@@ -18,17 +19,17 @@ class MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPress,
-      highlightColor: const Color(0xFF695CFE),
+      highlightColor: Colors.white.withOpacity(0.1),
       overlayColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.hovered)) {
-          return const Color(0xFF695CFE).withOpacity(0.3);
+          return Colors.white;
         }
         return null;
       }),
       borderRadius: BorderRadius.circular(8),
       child: Ink(
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF695CFE) : null,
+          color: isSelected ? Colors.white : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -37,7 +38,7 @@ class MenuItem extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               child: Icon(
                 iconData,
-                color: isSelected ? Colors.white : Colors.black,
+                color: isSelected ? secondaryColor : secondaryColorSubtitle,
               ),
             ),
             Expanded(
@@ -46,7 +47,7 @@ class MenuItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: isSelected ? Colors.white : Colors.black,
+                  color: isSelected ? secondaryColor : secondaryColorSubtitle,
                 ),
                 maxLines: 1,
               ),

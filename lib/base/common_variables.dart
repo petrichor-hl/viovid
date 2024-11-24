@@ -10,5 +10,25 @@ TextStyle errorTextStyle(BuildContext context) {
   return TextStyle(color: Theme.of(context).colorScheme.error);
 }
 
-bool isNormalUser =
-    profileData['end_date'] == null || (profileData['end_date'] != null && DateTime.tryParse(profileData['end_date']) != null && DateTime.parse(profileData['end_date']).isBefore(DateTime.now()));
+const secondaryColor = Color.fromARGB(255, 255, 81, 81);
+
+const secondaryColorBg = Color.fromARGB(255, 250, 250, 250);
+
+const secondaryColorSideBorder = Color.fromARGB(255, 241, 241, 241);
+
+const secondaryColorSubtitle = Color(0xFF686868);
+
+const secondaryColorBorder = Color.fromARGB(255, 217, 217, 217);
+
+const secondaryColorTitle = Color.fromARGB(255, 48, 48, 48);
+
+const secondaryColorDisable = Color.fromARGB(255, 178, 178, 178);
+
+const secondaryColorBaseBg = Color.fromARGB(255, 255, 239, 231);
+
+const defaultPadding = 16.0;
+
+bool isNormalUser = profileData['end_date'] == null ||
+    (profileData['end_date'] != null &&
+        DateTime.tryParse(profileData['end_date']) != null &&
+        DateTime.parse(profileData['end_date']).isBefore(DateTime.now()));

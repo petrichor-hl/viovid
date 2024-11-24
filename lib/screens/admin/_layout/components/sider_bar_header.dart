@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:viovid/base/common_variables.dart';
 
 class SideBarHeader extends StatelessWidget {
   const SideBarHeader({
@@ -12,16 +13,18 @@ class SideBarHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        IconButton.outlined(
+        IconButton(
           onPressed: onPress,
           icon: const Icon(Icons.menu_rounded),
           style: IconButton.styleFrom(
+            foregroundColor: secondaryColorSubtitle,
             padding: const EdgeInsets.symmetric(
               horizontal: 14,
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
+            // side: const BorderSide(color: secondaryColorSubtitle, width: 1),
           ),
         ),
         const Expanded(
@@ -33,10 +36,11 @@ class SideBarHeader extends StatelessWidget {
               children: [
                 Text(
                   'System Admin',
-                  // style: TextStyle(fontSize: 18),
+                  style: TextStyle(color: secondaryColorTitle),
                   maxLines: 1,
                 ),
-                Text('admin@viovid.com', maxLines: 1)
+                Text('admin@viovid.com',
+                    maxLines: 1, style: TextStyle(color: secondaryColorTitle))
               ],
             ),
           ),
