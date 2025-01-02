@@ -229,8 +229,8 @@ class _ViovidAssistantDialogState extends State<ViovidAssistantDialog> {
     bool isBlock = _isProcessing || _isClearingThread;
 
     return Container(
-      width: 440,
-      height: 650,
+      width: 470,
+      height: 700,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: const Color(0xFF212121),
