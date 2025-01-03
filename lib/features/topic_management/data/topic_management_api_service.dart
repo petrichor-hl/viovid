@@ -13,11 +13,9 @@ class TopicManagementApiService {
       return await ApiClient(dio).request<void, List<TopicDto>>(
         url: '/Topic',
         method: ApiMethod.get,
-        fromJson: (resultJson) {
-          return (resultJson as List)
-              .map((topic) => TopicDto.fromJson(topic))
-              .toList();
-        },
+        fromJson: (resultJson) => (resultJson as List)
+            .map((topic) => TopicDto.fromJson(topic))
+            .toList(),
       );
     } on DioException catch (e) {
       if (e.response != null) {
@@ -34,11 +32,28 @@ class TopicManagementApiService {
         url: '/Topic/re-order',
         method: ApiMethod.post,
         payload: reorderTopicsDto,
-        fromJson: (resultJson) {
-          return (resultJson as List)
-              .map((topic) => TopicDto.fromJson(topic))
-              .toList();
+        fromJson: (resultJson) => (resultJson as List)
+            .map((topic) => TopicDto.fromJson(topic))
+            .toList(),
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['Errors'][0]['Message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<TopicDto> addNewTopic(String topicName) async {
+    try {
+      return await ApiClient(dio).request<void, TopicDto>(
+        url: '/Topic',
+        method: ApiMethod.post,
+        payload: {
+          "name": topicName,
         },
+        fromJson: (resultJson) => TopicDto.fromJson(resultJson),
       );
     } on DioException catch (e) {
       if (e.response != null) {

@@ -57,4 +57,28 @@ class TopicManagementCubit extends Cubit<TopicManagementState> {
         ),
     });
   }
+
+  Future<void> addNewTopic(String topicName) async {
+    emit(
+      state.copyWith(
+        isLoading: true,
+        errorMessage: "",
+      ),
+    );
+    final result = await topicManagementRepository.addNewTopic(topicName);
+    return (switch (result) {
+      Success() => emit(
+          state.copyWith(
+            isLoading: false,
+            topics: [...?state.topics, result.data],
+          ),
+        ),
+      Failure() => emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: result.message,
+          ),
+        ),
+    });
+  }
 }

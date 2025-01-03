@@ -39,4 +39,15 @@ class TopicManagementRepository {
       return Failure('$error');
     }
   }
+
+  Future<Result<TopicDto>> addNewTopic(String topicName) async {
+    try {
+      return Success(
+        await topicManagementApiService.addNewTopic(topicName),
+      );
+    } catch (error) {
+      log('$error');
+      return Failure('$error');
+    }
+  }
 }

@@ -5,6 +5,7 @@ import 'package:viovid/base/components/error_dialog.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
 import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
+import 'package:viovid/screens/admin/topic_management/components/add_topic_dialog.dart';
 
 class TopicManagementScreen extends StatefulWidget {
   const TopicManagementScreen({super.key});
@@ -95,29 +96,69 @@ class _TopicManagementScreenState extends State<TopicManagementScreen> {
   }
 
   Widget _buildTopicManagement(List<TopicDto> topics) {
-    return ReorderableListView(
-      onReorder: updateOrder,
-      padding: const EdgeInsets.all(16),
-      children: [
-        for (final topic in topics)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            key: ValueKey(topic.topicId),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              topic.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        spacing: 16,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FilledButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => BlocProvider.value(
+                  value: context.read<TopicManagementCubit>(),
+                  child: AddTopicDialog(),
+                ),
+              );
+            },
+            style: IconButton.styleFrom(
+              fixedSize: const Size.fromHeight(48),
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF695CFE),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
+            child: const Row(
+              spacing: 4,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.add_rounded),
+                Text(
+                  'Thêm Topic',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
-      ],
+          Expanded(
+            child: ReorderableListView(
+              onReorder: updateOrder,
+              children: [
+                for (final topic in topics)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    key: ValueKey(topic.topicId),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      topic.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
