@@ -81,4 +81,30 @@ class TopicManagementCubit extends Cubit<TopicManagementState> {
         ),
     });
   }
+
+  Future<void> deleteTopic(String topicId) async {
+    emit(
+      state.copyWith(
+        isLoading: true,
+        errorMessage: "",
+      ),
+    );
+    final result = await topicManagementRepository.deleteTopic(topicId);
+    return (switch (result) {
+      Success() => emit(
+          state.copyWith(
+            isLoading: false,
+            topics: state.topics
+                ?.where((topic) => topic.topicId != topicId)
+                .toList(),
+          ),
+        ),
+      Failure() => emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: result.message,
+          ),
+        ),
+    });
+  }
 }

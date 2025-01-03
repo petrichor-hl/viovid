@@ -50,4 +50,15 @@ class TopicManagementRepository {
       return Failure('$error');
     }
   }
+
+  Future<Result<String>> deleteTopic(String topicId) async {
+    try {
+      return Success(
+        await topicManagementApiService.deleteTopic(topicId),
+      );
+    } catch (error) {
+      log('$error');
+      return Failure('$error');
+    }
+  }
 }

@@ -63,4 +63,19 @@ class TopicManagementApiService {
       }
     }
   }
+
+  Future<String> deleteTopic(String topicId) async {
+    try {
+      return await ApiClient(dio).request<void, String>(
+        url: '/Topic/$topicId',
+        method: ApiMethod.delete,
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['Errors'][0]['Message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
 }

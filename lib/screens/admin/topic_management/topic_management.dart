@@ -146,12 +146,39 @@ class _TopicManagementScreenState extends State<TopicManagementScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      topic.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          topic.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () {
+                            context
+                                .read<TopicManagementCubit>()
+                                .deleteTopic(topic.topicId);
+                          },
+                          style: ButtonStyle(
+                            iconColor: WidgetStateColor.resolveWith(
+                              (state) {
+                                if (state.contains(WidgetState.hovered)) {
+                                  return Colors.red;
+                                }
+                                return Colors.black45;
+                              },
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.delete_rounded,
+                          ),
+                        ),
+                        const Gap(30),
+                      ],
                     ),
                   ),
               ],
