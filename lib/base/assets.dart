@@ -67,4 +67,11 @@ class Assets {
   static const String _videos = 'assets/videos/';
   static const String violetEvergardenOfflineVideoUrl =
       '${_videos}violet_evergarden_trailer.mp4';
+
+  // BADGE
+  static const String _badges = '${_images}badge/';
+  static const String momoBadge = '${_badges}momo.png';
+  static const String vnPayBadge = '${_badges}vnPay.png';
+  static const String stripeBadge = '${_badges}stripe.png';
+  static const String metaMaskBadge = '${_badges}metaMask.png';
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/base/components/search_field.dart';
+// import 'package:viovid/base/components/search_field.dart';
 
 class Header extends StatelessWidget {
   const Header({
@@ -19,7 +19,7 @@ class Header extends StatelessWidget {
               ?.copyWith(color: secondaryColorTitle),
         ),
         const Spacer(),
-        const Expanded(child: SearchField()),
+        // const Expanded(child: SearchField()),
       ],
     );
   }
