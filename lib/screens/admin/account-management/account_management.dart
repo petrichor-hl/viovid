@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:viovid/base/components/error_dialog.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_state.dart';
 import 'package:viovid/features/account_manament/dtos/account_dto.dart';
@@ -32,7 +33,15 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AccountListCubit, AccountListState>(
-      listener: (ctx, state) {},
+      listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
+      listener: (ctx, state) {
+        if (state.errorMessage.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ErrorDialog(errorMessage: state.errorMessage),
+          );
+        }
+      },
       builder: (ctx, state) {
         if (state.isLoading) {
           return _buildInProgressWidget();
@@ -40,8 +49,8 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
         if (state.accounts != null) {
           return _buildAccountManagement(state.accounts!);
         }
-        if (state.errorMessage != null) {
-          return _buildFailureWidget(state.errorMessage!);
+        if (state.errorMessage.isNotEmpty) {
+          return _buildFailureWidget(state.errorMessage);
         }
         return const SizedBox();
       },
@@ -76,7 +85,7 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 16,
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),

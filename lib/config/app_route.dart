@@ -7,6 +7,9 @@ import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
 import 'package:viovid/features/account_manament/data/account_list_repository.dart';
+import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
+import 'package:viovid/features/topic_management/data/topic_management_api_service.dart';
+import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
 import 'package:viovid/main.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
@@ -222,7 +225,14 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/topic-management',
           name: 'topic-management',
-          builder: (context, state) => const TopicManagementScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => TopicManagementCubit(
+              TopicManagementRepository(
+                topicManagementApiService: TopicManagementApiService(dio),
+              ),
+            ),
+            child: const TopicManagementScreen(),
+          ),
         ),
         GoRoute(
           path: '/admin/account-management',

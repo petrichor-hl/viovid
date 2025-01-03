@@ -1,28 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:viovid/features/account_manament/cubit/account_list_state.dart';
-import 'package:viovid/features/account_manament/data/account_list_repository.dart';
 import 'package:viovid/features/result_type.dart';
+import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
+import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
 
-class AccountListCubit extends Cubit<AccountListState> {
-  final AccountListRepository accountListRepository;
+class TopicManagementCubit extends Cubit<TopicManagementState> {
+  final TopicManagementRepository topicManagementRepository;
 
-  AccountListCubit(this.accountListRepository) : super(AccountListState());
+  TopicManagementCubit(this.topicManagementRepository)
+      : super(TopicManagementState());
 
-  Future<void> getAccountList({String? searchText}) async {
+  Future<void> getTopicList() async {
     emit(
       state.copyWith(
         isLoading: true,
         errorMessage: "",
       ),
     );
-    final result = await accountListRepository.getAccountList(
-      searchText: searchText,
-    );
+    final result = await topicManagementRepository.getTopicList();
     return (switch (result) {
       Success() => emit(
           state.copyWith(
             isLoading: false,
-            accounts: result.data,
+            topics: result.data,
           ),
         ),
       Failure() => emit(
@@ -34,21 +33,20 @@ class AccountListCubit extends Cubit<AccountListState> {
     });
   }
 
-  Future<void> deleteAccount(String userId) async {
+  Future<void> reorderTopic(int oldIndex, int newIndex) async {
     emit(
       state.copyWith(
         isLoading: true,
         errorMessage: "",
       ),
     );
-    final result = await accountListRepository.deleteAccount(userId);
+    final result =
+        await topicManagementRepository.reorderTopic(oldIndex, newIndex);
     return (switch (result) {
       Success() => emit(
           state.copyWith(
             isLoading: false,
-            accounts: state.accounts
-                ?.where((account) => account.applicationUserId != userId)
-                .toList(),
+            topics: result.data,
           ),
         ),
       Failure() => emit(

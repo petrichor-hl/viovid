@@ -3,12 +3,12 @@ import 'package:viovid/features/account_manament/dtos/account_dto.dart';
 class AccountListState {
   final bool isLoading;
   final List<AccountDto>? accounts;
-  final String? errorMessage;
+  final String errorMessage;
 
   AccountListState({
     this.isLoading = false,
     this.accounts,
-    this.errorMessage,
+    this.errorMessage = "",
   });
 
   AccountListState copyWith({
