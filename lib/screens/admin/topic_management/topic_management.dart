@@ -12,7 +12,10 @@ class _TopicManagementScreenState extends State<TopicManagementScreen> {
   late List<Map<String, dynamic>> _topics;
   late final _futureTopics = _fetchTopics();
   Future<void> _fetchTopics() async {
-    _topics = await supabase.from('topic').select('id, name').order('order', ascending: true);
+    _topics = await supabase
+        .from('topic')
+        .select('id, name')
+        .order('order', ascending: true);
   }
 
   void updateOrder(int oldIndex, int newIndex) async {
@@ -26,7 +29,9 @@ class _TopicManagementScreenState extends State<TopicManagementScreen> {
     });
 
     for (int i = 0; i < _topics.length; ++i) {
-      await supabase.from('topic').update({'order': i}).eq('id', _topics[i]['id']);
+      await supabase
+          .from('topic')
+          .update({'order': i}).eq('id', _topics[i]['id']);
     }
   }
 

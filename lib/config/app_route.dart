@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/bloc/cubits/video_state_cubit.dart';
 import 'package:viovid/bloc/repositories/selected_film_repo.dart';
+import 'package:viovid/config/api.config.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
+import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
+import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
+import 'package:viovid/features/account_manament/data/account_list_repository.dart';
 import 'package:viovid/main.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
@@ -194,26 +198,26 @@ GoRouter appRouter = GoRouter(
           path: '/admin/film-management',
           name: 'film-management',
           builder: (context, state) => const FilmManagementScreen(),
-          routes: [
-            // GoRoute(
-            //   path: 'add',
-            //   name: 'add-film',
-            //   builder: (context, state) => const AddFilm(),
-            // ),
-            // GoRoute(
-            //   path: 'edit/:filmId',
-            //   name: 'edit-film',
-            //   // builder: (context, state) => EditFilm(
-            //   //   filmId: state.pathParameters['filmId']!,
-            //   // ),
-            //   builder: (ctx, state) => RepositoryProvider(
-            //     create: (context) => SelectedFilmRepo(),
-            //     child: EditFilm(
-            //       filmId: state.pathParameters['filmId']!,
-            //     ),
-            //   ),
-            // )
-          ],
+          // routes: [
+          //   GoRoute(
+          //     path: 'add',
+          //     name: 'add-film',
+          //     builder: (context, state) => const AddFilm(),
+          //   ),
+          //   GoRoute(
+          //     path: 'edit/:filmId',
+          //     name: 'edit-film',
+          //     // builder: (context, state) => EditFilm(
+          //     //   filmId: state.pathParameters['filmId']!,
+          //     // ),
+          //     builder: (ctx, state) => RepositoryProvider(
+          //       create: (context) => SelectedFilmRepo(),
+          //       child: EditFilm(
+          //         filmId: state.pathParameters['filmId']!,
+          //       ),
+          //     ),
+          //   )
+          // ],
         ),
         GoRoute(
           path: '/admin/topic-management',
@@ -223,7 +227,14 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/account-management',
           name: 'account-management',
-          builder: (context, state) => const AccountManagementScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => AccountListCubit(
+              AccountListRepository(
+                accountListApiService: AccountListApiService(dio),
+              ),
+            ),
+            child: const AccountManagementScreen(),
+          ),
         ),
       ],
     ),

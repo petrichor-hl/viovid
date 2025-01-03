@@ -21,6 +21,8 @@ Future<void> main() async {
 
   runApp(const MyApp());
   // flutter run -d chrome --web-renderer html --dart-define-from-file=lib/config/.env
+  // admin@viovid.com
+  // admin123
 }
 
 const openAIApiKey = String.fromEnvironment('OPEN_AI_API_KEY');
