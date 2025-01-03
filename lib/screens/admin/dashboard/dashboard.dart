@@ -18,8 +18,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   //   await Future.delayed(const Duration(milliseconds: 10));
   // }
 
-  // List<Topic> topicsData = [];
-
   @override
   Widget build(BuildContext context) {
     const List<Color> palette = [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:viovid/base/assets.dart';
 import 'package:viovid/base/common_variables.dart';
@@ -8,6 +9,7 @@ import 'package:viovid/base/components/password_input.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/main.dart';
 import 'package:viovid/screens/auth/components/sign_up_button.dart';
+import 'package:viovid/service/service.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -52,6 +54,10 @@ class _SignInScreenState extends State<SignInScreen> {
         email: enteredEmail,
         password: enteredPassword,
       );
+
+      final authResponse = await signIn(enteredEmail, enteredPassword);
+      print("Auth response $authResponse");
+      print(localStorage.getItem('accessToken'));
 
       if (authRes.session != null) {
         await fetchProfileData();
