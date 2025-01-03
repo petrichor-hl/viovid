@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/data/dynamic/topics_data.dart';
+import 'package:viovid/models/topic.dart';
 import 'package:viovid/screens/admin/dashboard/components/chart.dart';
 import 'package:viovid/screens/admin/dashboard/components/header.dart';
 
@@ -16,6 +17,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   //   await fetchTopicsData();
   //   await Future.delayed(const Duration(milliseconds: 10));
   // }
+
+  // List<Topic> topicsData = [];
 
   @override
   Widget build(BuildContext context) {
@@ -38,43 +41,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     //       return const Center(child: Text('Error fetching data'));
     //     } else {
     return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(defaultPadding),
-        child: Column(
-          children: [
-            const Header(),
-            const SizedBox(height: 6),
-            const Divider(
-              color: secondaryColorBorder,
-              thickness: 1,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    height: 500,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: secondaryColorBorder,
-                        width: 1,
-                      ),
+      child: Column(
+        children: [
+          const Header(),
+          const SizedBox(height: 6),
+          const Divider(
+            color: secondaryColorBorder,
+            thickness: 1,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 5,
+                child: Container(
+                  height: 500,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: secondaryColorBorder,
+                      width: 1,
                     ),
                   ),
                 ),
-                const SizedBox(width: defaultPadding),
-                DashboardChart(
-                  palette: palette,
-                  data: topicsData,
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(width: defaultPadding),
+              DashboardChart(
+                palette: palette,
+                data: topicsData,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
