@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
+import 'package:viovid/config/api.config.dart';
 import 'package:viovid/models/dto/dto_film.dart';
 import 'package:viovid/models/dto/dto_payment.dart';
 import 'package:viovid/models/dto/dto_plan.dart';
@@ -8,13 +9,13 @@ import 'package:viovid/models/dto/dto_sign_in_response.dart';
 import 'package:viovid/models/dto/dto_top_view_film.dart';
 import 'package:viovid/models/dto/dto_topic.dart';
 
-String url = const String.fromEnvironment("URL_ROOT");
+String url = dio.options.baseUrl;
 final headers = {'Content-Type': 'application/json'};
 
 Future<bool> signIn(String email, String password) async {
   try {
     final response = await http.post(
-      Uri.parse('$url/api/Account/login'),
+      Uri.parse('$url/Account/login'),
       body: {
         'email': email,
         'password': password,
@@ -47,7 +48,7 @@ Future<bool> signIn(String email, String password) async {
 Future<List<DtoTopic>> fetchTopics() async {
   try {
     final response = await http.get(
-      Uri.parse('$url/api/Topic'),
+      Uri.parse('$url/Topic'),
     );
 
     if (response.statusCode == 200) {
@@ -83,7 +84,7 @@ Future<List<int>> fetchUserRegist(int year) async {
   try {
     // return [5, 7, 10, 90, 80, 12, 14, 13, 11, 10, 70, 60];
     final response = await http.get(
-      Uri.parse('$url/api/Dashboard/registration-stats/$year'),
+      Uri.parse('$url/Dashboard/registration-stats/$year'),
     );
 
     if (response.statusCode == 200) {
@@ -106,7 +107,7 @@ Future<List<int>> fetchUserRegist(int year) async {
 Future<List<DtoPayment>> fetchPayments(int year) async {
   try {
     final response = await http.get(
-      Uri.parse('$url/api/Dashboard/payment-summary/$year'),
+      Uri.parse('$url/Dashboard/payment-summary/$year'),
     );
 
     if (response.statusCode == 200) {
@@ -154,7 +155,7 @@ Future<String> getMostUsedPaymentType() async {
 Future<List<DtoTopViewFilm>> fetchTopViewFilms(int num) async {
   try {
     final response = await http.get(
-      Uri.parse('$url/api/Dashboard/top-views?Count=$num'),
+      Uri.parse('$url/Dashboard/top-views?Count=$num'),
     );
 
     if (response.statusCode == 200) {
@@ -177,7 +178,7 @@ Future<List<DtoTopViewFilm>> fetchTopViewFilms(int num) async {
 Future<List<DtoPlan>> fetchPlans() async {
   try {
     final response = await http.get(
-      Uri.parse('$url/api/Plan'),
+      Uri.parse('$url/Plan'),
     );
 
     if (response.statusCode == 200) {
@@ -205,7 +206,7 @@ Future<String> createPlan(DtoPlan plan) async {
   };
   try {
     final response = await http.post(
-      Uri.parse('$url/api/Plan'),
+      Uri.parse('$url/Plan'),
       headers: headers,
       body: jsonEncode(body),
     );
@@ -234,7 +235,7 @@ Future<bool> editPlan(DtoPlan plan) async {
   };
   try {
     final response = await http.put(
-      Uri.parse('$url/api/Plan/${plan.id}'),
+      Uri.parse('$url/Plan/${plan.id}'),
       headers: headers,
       body: jsonEncode(body),
     );
@@ -253,7 +254,7 @@ Future<bool> editPlan(DtoPlan plan) async {
 Future<bool> deletePlan(String id) async {
   try {
     final response = await http.delete(
-      Uri.parse('$url/api/Plan/$id'),
+      Uri.parse('$url/Plan/$id'),
       headers: headers,
     );
 
