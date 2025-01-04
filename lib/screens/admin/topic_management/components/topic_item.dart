@@ -21,9 +21,6 @@ class TopicItem extends StatelessWidget {
       hoverColor: Colors.transparent,
       onTap: () => context.go(
         '${GoRouterState.of(context).uri}/${topic.topicId}',
-        extra: {
-          'topic': topic,
-        },
       ),
       child: Container(
         width: double.infinity,

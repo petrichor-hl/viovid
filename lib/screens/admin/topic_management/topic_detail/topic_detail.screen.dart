@@ -200,14 +200,17 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
-                                    child: Text(
-                                      topicDetail.films[index].name,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                        topicDetail.films[index].name,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   IconButton(

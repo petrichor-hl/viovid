@@ -7,6 +7,9 @@ import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
 import 'package:viovid/features/account_manament/data/account_list_repository.dart';
+import 'package:viovid/features/film_management/cubit/film_management_cubit.dart';
+import 'package:viovid/features/film_management/data/film_management_api_service.dart';
+import 'package:viovid/features/film_management/data/film_management_repository.dart';
 import 'package:viovid/features/topic_detail/cubit/topic_detail_cubit.dart';
 import 'package:viovid/features/topic_detail/data/topic_detail_api_service.dart';
 import 'package:viovid/features/topic_detail/data/topic_detail_repository.dart';
@@ -204,27 +207,30 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/film-management',
           name: 'film-management',
-          builder: (context, state) => const FilmManagementScreen(),
-          // routes: [
-          //   GoRoute(
-          //     path: 'add',
-          //     name: 'add-film',
-          //     builder: (context, state) => const AddFilm(),
-          //   ),
-          //   GoRoute(
-          //     path: 'edit/:filmId',
-          //     name: 'edit-film',
-          //     // builder: (context, state) => EditFilm(
-          //     //   filmId: state.pathParameters['filmId']!,
-          //     // ),
-          //     builder: (ctx, state) => RepositoryProvider(
-          //       create: (context) => SelectedFilmRepo(),
-          //       child: EditFilm(
-          //         filmId: state.pathParameters['filmId']!,
-          //       ),
-          //     ),
-          //   )
-          // ],
+          builder: (context, state) => BlocProvider(
+            create: (context) => FilmManagementCubit(
+              FilmManagementRepository(
+                topicManagementApiService: FilmManagementApiService(dio),
+              ),
+            ),
+            child: const FilmManagementScreen(),
+          ),
+          routes: [
+            GoRoute(
+              path: 'add',
+              name: 'add-film',
+              builder: (context, state) {
+                return const Placeholder();
+              },
+            ),
+            GoRoute(
+              path: 'edit/:filmId',
+              name: 'edit-film',
+              builder: (context, state) {
+                return const Placeholder();
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/admin/topic-management',
