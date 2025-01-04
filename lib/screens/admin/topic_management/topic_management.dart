@@ -6,6 +6,7 @@ import 'package:viovid/features/topic_management/cubit/topic_management_cubit.da
 import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
 import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
 import 'package:viovid/screens/admin/topic_management/components/add_topic_dialog.dart';
+import 'package:viovid/screens/admin/topic_management/components/topic_item.dart';
 
 class TopicManagementScreen extends StatefulWidget {
   const TopicManagementScreen({super.key});
@@ -137,49 +138,9 @@ class _TopicManagementScreenState extends State<TopicManagementScreen> {
               onReorder: updateOrder,
               children: [
                 for (final topic in topics)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.symmetric(vertical: 4),
+                  TopicItem(
                     key: ValueKey(topic.topicId),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          topic.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () {
-                            context
-                                .read<TopicManagementCubit>()
-                                .deleteTopic(topic.topicId);
-                          },
-                          style: ButtonStyle(
-                            iconColor: WidgetStateColor.resolveWith(
-                              (state) {
-                                if (state.contains(WidgetState.hovered)) {
-                                  return Colors.red;
-                                }
-                                return Colors.black45;
-                              },
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.delete_rounded,
-                          ),
-                        ),
-                        const Gap(30),
-                      ],
-                    ),
+                    topic: topic,
                   ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:viovid/base/components/confirm_dialog.dart';
 import 'package:viovid/base/components/error_dialog.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_state.dart';
@@ -281,9 +282,18 @@ class _AccountManagementScreenState extends State<AccountManagementScreen> {
                         child: Center(
                           child: IconButton(
                             onPressed: () {
-                              context.read<AccountListCubit>().deleteAccount(
-                                    accounts[index].applicationUserId,
-                                  );
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => ConfirmDialog(
+                                  confirmMessage:
+                                      'Bạn có chắc muốn xoá Tài khoản này',
+                                  onConfirm: () => context
+                                      .read<AccountListCubit>()
+                                      .deleteAccount(
+                                        accounts[index].applicationUserId,
+                                      ),
+                                ),
+                              );
                             },
                             style: ButtonStyle(
                               iconColor: WidgetStateColor.resolveWith(

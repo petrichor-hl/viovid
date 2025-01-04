@@ -17,6 +17,7 @@ import 'package:viovid/screens/admin/account-management/account_management.dart'
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
 import 'package:viovid/screens/admin/film_management/film_management.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
+import 'package:viovid/screens/admin/topic_management/topic_detail.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
 // import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 // import 'package:viovid/screens/admin/account-management/account_management.dart';
@@ -233,6 +234,13 @@ GoRouter appRouter = GoRouter(
             ),
             child: const TopicManagementScreen(),
           ),
+          routes: [
+            GoRoute(
+              path: ':topicId',
+              name: 'topic-detail',
+              builder: (context, state) => const TopicDetailScreen(),
+            ),
+          ],
         ),
         GoRoute(
           path: '/admin/account-management',
