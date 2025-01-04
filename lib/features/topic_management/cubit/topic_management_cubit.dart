@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/features/result_type.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
 import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
+import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
 
 class TopicManagementCubit extends Cubit<TopicManagementState> {
   final TopicManagementRepository topicManagementRepository;
@@ -71,6 +72,39 @@ class TopicManagementCubit extends Cubit<TopicManagementState> {
           state.copyWith(
             isLoading: false,
             topics: [...?state.topics, result.data],
+          ),
+        ),
+      Failure() => emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: result.message,
+          ),
+        ),
+    });
+  }
+
+  Future<void> editTopic(String editedTopicId, String editedTopicName) async {
+    emit(
+      state.copyWith(
+        isLoading: true,
+        errorMessage: "",
+      ),
+    );
+    final result = await topicManagementRepository.editTopic(
+        editedTopicId, editedTopicName);
+    return (switch (result) {
+      Success() => emit(
+          state.copyWith(
+            isLoading: false,
+            topics: state.topics
+                ?.map((topic) => topic.topicId == editedTopicId
+                    ? TopicDto(
+                        topicId: topic.topicId,
+                        name: editedTopicName,
+                        films: topic.films,
+                      )
+                    : topic)
+                .toList(),
           ),
         ),
       Failure() => emit(

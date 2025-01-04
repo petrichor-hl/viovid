@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:viovid/base/components/confirm_dialog.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
 import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
+import 'package:viovid/screens/admin/topic_management/components/edit_topic_dialog.dart';
 
 class TopicItem extends StatelessWidget {
   const TopicItem({
@@ -44,7 +45,15 @@ class TopicItem extends StatelessWidget {
             const Spacer(),
             IconButton(
               onPressed: () {
-                // context.read<TopicManagementCubit>().deleteTopic(topic.topicId);
+                showDialog(
+                  context: context,
+                  builder: (ctx) => BlocProvider.value(
+                    value: context.read<TopicManagementCubit>(),
+                    child: EditTopicDialog(
+                      topic: topic,
+                    ),
+                  ),
+                );
               },
               style: ButtonStyle(
                 iconColor: WidgetStateColor.resolveWith(

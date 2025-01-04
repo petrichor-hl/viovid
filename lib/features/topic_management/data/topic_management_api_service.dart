@@ -64,6 +64,24 @@ class TopicManagementApiService {
     }
   }
 
+  Future<bool> editTopic(String editedTopicId, String editedTopicName) async {
+    try {
+      return await ApiClient(dio).request<void, bool>(
+        url: '/Topic/$editedTopicId',
+        method: ApiMethod.put,
+        payload: {
+          "name": editedTopicName,
+        },
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['Errors'][0]['Message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
   Future<String> deleteTopic(String topicId) async {
     try {
       return await ApiClient(dio).request<void, String>(

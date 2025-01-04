@@ -3,18 +3,27 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
+import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
 
-class AddTopicDialog extends StatelessWidget {
-  AddTopicDialog({super.key});
+class EditTopicDialog extends StatelessWidget {
+  EditTopicDialog({
+    super.key,
+    required this.topic,
+  });
 
-  final _controller = TextEditingController();
+  final TopicDto topic;
 
-  void handleAddTopic(BuildContext context) async {
+  late final _controller = TextEditingController(text: topic.name);
+
+  void handleEditTopic(BuildContext context) async {
     if (_controller.text.isEmpty) {
       return;
     }
 
-    context.read<TopicManagementCubit>().addNewTopic(_controller.text);
+    context.read<TopicManagementCubit>().editTopic(
+          topic.topicId,
+          _controller.text,
+        );
 
     context.pop();
   }
@@ -33,7 +42,7 @@ class AddTopicDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Thêm Topic mới',
+              'Chỉnh sửa Topic',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -80,11 +89,11 @@ class AddTopicDialog extends StatelessWidget {
                 ),
                 contentPadding: const EdgeInsets.all(14),
               ),
-              onEditingComplete: () => handleAddTopic(context),
+              onEditingComplete: () => handleEditTopic(context),
             ),
             const Gap(20),
             FilledButton(
-              onPressed: () => handleAddTopic(context),
+              onPressed: () => handleEditTopic(context),
               style: FilledButton.styleFrom(
                 fixedSize: const Size.fromHeight(48),
                 foregroundColor: Colors.white,

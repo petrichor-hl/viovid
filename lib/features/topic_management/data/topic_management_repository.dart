@@ -51,6 +51,21 @@ class TopicManagementRepository {
     }
   }
 
+  Future<Result<bool>> editTopic(
+    String editedTopicId,
+    String editedTopicName,
+  ) async {
+    try {
+      return Success(
+        await topicManagementApiService.editTopic(
+            editedTopicId, editedTopicName),
+      );
+    } catch (error) {
+      log('$error');
+      return Failure('$error');
+    }
+  }
+
   Future<Result<String>> deleteTopic(String topicId) async {
     try {
       return Success(
