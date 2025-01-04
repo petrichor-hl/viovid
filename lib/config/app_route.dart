@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/bloc/cubits/video_state_cubit.dart';
 import 'package:viovid/bloc/repositories/selected_film_repo.dart';
+import 'package:viovid/config/api.config.dart';
 import 'package:viovid/data/dynamic/profile_data.dart';
+import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
+import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
+import 'package:viovid/features/account_manament/data/account_list_repository.dart';
+import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
+import 'package:viovid/features/topic_management/data/topic_management_api_service.dart';
+import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
 import 'package:viovid/main.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
@@ -10,6 +17,7 @@ import 'package:viovid/screens/admin/account-management/account_management.dart'
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
 import 'package:viovid/screens/admin/film_management/film_management.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
+import 'package:viovid/screens/admin/topic_management/topic_detail.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
 // import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 // import 'package:viovid/screens/admin/account-management/account_management.dart';
@@ -194,36 +202,57 @@ GoRouter appRouter = GoRouter(
           path: '/admin/film-management',
           name: 'film-management',
           builder: (context, state) => const FilmManagementScreen(),
-          routes: [
-            // GoRoute(
-            //   path: 'add',
-            //   name: 'add-film',
-            //   builder: (context, state) => const AddFilm(),
-            // ),
-            // GoRoute(
-            //   path: 'edit/:filmId',
-            //   name: 'edit-film',
-            //   // builder: (context, state) => EditFilm(
-            //   //   filmId: state.pathParameters['filmId']!,
-            //   // ),
-            //   builder: (ctx, state) => RepositoryProvider(
-            //     create: (context) => SelectedFilmRepo(),
-            //     child: EditFilm(
-            //       filmId: state.pathParameters['filmId']!,
-            //     ),
-            //   ),
-            // )
-          ],
+          // routes: [
+          //   GoRoute(
+          //     path: 'add',
+          //     name: 'add-film',
+          //     builder: (context, state) => const AddFilm(),
+          //   ),
+          //   GoRoute(
+          //     path: 'edit/:filmId',
+          //     name: 'edit-film',
+          //     // builder: (context, state) => EditFilm(
+          //     //   filmId: state.pathParameters['filmId']!,
+          //     // ),
+          //     builder: (ctx, state) => RepositoryProvider(
+          //       create: (context) => SelectedFilmRepo(),
+          //       child: EditFilm(
+          //         filmId: state.pathParameters['filmId']!,
+          //       ),
+          //     ),
+          //   )
+          // ],
         ),
         GoRoute(
           path: '/admin/topic-management',
           name: 'topic-management',
-          builder: (context, state) => const TopicManagementScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => TopicManagementCubit(
+              TopicManagementRepository(
+                topicManagementApiService: TopicManagementApiService(dio),
+              ),
+            ),
+            child: const TopicManagementScreen(),
+          ),
+          routes: [
+            GoRoute(
+              path: ':topicId',
+              name: 'topic-detail',
+              builder: (context, state) => const TopicDetailScreen(),
+            ),
+          ],
         ),
         GoRoute(
           path: '/admin/account-management',
           name: 'account-management',
-          builder: (context, state) => const AccountManagementScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => AccountListCubit(
+              AccountListRepository(
+                accountListApiService: AccountListApiService(dio),
+              ),
+            ),
+            child: const AccountManagementScreen(),
+          ),
         ),
       ],
     ),

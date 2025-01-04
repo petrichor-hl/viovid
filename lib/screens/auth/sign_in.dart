@@ -17,8 +17,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final _emailController = TextEditingController(text: "admin@viovid.com");
-  final _passwordController = TextEditingController(text: "admin123");
+  final _emailController = TextEditingController(text: 'admin@viovid.com');
+  final _passwordController = TextEditingController(text: 'admin123');
 
   bool _isProcessing = false;
 
