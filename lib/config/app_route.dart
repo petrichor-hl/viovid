@@ -7,6 +7,9 @@ import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
 import 'package:viovid/features/account_manament/data/account_list_repository.dart';
+import 'package:viovid/features/topic_detail/cubit/topic_detail_cubit.dart';
+import 'package:viovid/features/topic_detail/data/topic_detail_api_service.dart';
+import 'package:viovid/features/topic_detail/data/topic_detail_repository.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
 import 'package:viovid/features/topic_management/data/topic_management_api_service.dart';
 import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
@@ -17,7 +20,7 @@ import 'package:viovid/screens/admin/account-management/account_management.dart'
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
 import 'package:viovid/screens/admin/film_management/film_management.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
-import 'package:viovid/screens/admin/topic_management/topic_detail.dart';
+import 'package:viovid/screens/admin/topic_management/topic_detail/topic_detail.screen.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
 // import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 // import 'package:viovid/screens/admin/account-management/account_management.dart';
@@ -238,7 +241,18 @@ GoRouter appRouter = GoRouter(
             GoRoute(
               path: ':topicId',
               name: 'topic-detail',
-              builder: (context, state) => const TopicDetailScreen(),
+              builder: (context, state) {
+                return BlocProvider(
+                  create: (context) => TopicDetailCubit(
+                    TopicDetailRepository(
+                      topicDetailApiService: TopicDetailApiService(dio),
+                    ),
+                  ),
+                  child: TopicDetailScreen(
+                    topicId: state.pathParameters['topicId']!,
+                  ),
+                );
+              },
             ),
           ],
         ),
