@@ -62,6 +62,7 @@ class Assets {
   // ICON
   static const String _icons = 'assets/icons/';
   static const String userIcon = '${_icons}user-solid.svg';
+  static const String planIcon = '${_icons}planDecor.png';
 
   // VIDEO
   static const String _videos = 'assets/videos/';

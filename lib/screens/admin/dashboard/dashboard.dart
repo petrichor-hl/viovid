@@ -51,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                const Header(),
+                const Header(header: "Dashboard"),
                 const SizedBox(height: 6),
                 const Divider(
                   color: secondaryColorBorder,

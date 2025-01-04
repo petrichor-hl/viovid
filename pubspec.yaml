@@ -63,6 +63,7 @@ dependencies:
   web3dart: ^2.7.3
   walletconnect_flutter_v2: ^2.0.14
   localstorage: ^5.0.0
+  currency_text_input_formatter: ^2.2.6
 
 dev_dependencies:
   flutter_test:
