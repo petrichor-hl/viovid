@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:viovid/base/assets.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/service/service.dart';
+import 'package:viovid/features/dashboard_management/data/payment_list/payment_list_api_service.dart';
 
 class TopPaymentType extends StatelessWidget {
   const TopPaymentType({super.key});
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(

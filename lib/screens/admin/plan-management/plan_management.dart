@@ -191,8 +191,8 @@ class _PlanManagementScreenState extends State<PlanManagementScreen> {
                 FilledButton.icon(
                   onPressed: _selectedRow == -1
                       ? null
-                      : () {
-                          showDialog(
+                      : () async {
+                          await showDialog(
                             context: context,
                             builder: (ctx) => ConfirmDialog(
                               confirmMessage: 'Bạn có chắc muốn xoá Gói này',

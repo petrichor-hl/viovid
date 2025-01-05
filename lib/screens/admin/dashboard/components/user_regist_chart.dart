@@ -1,12 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/service/service.dart';
+import 'package:viovid/base/components/error_dialog.dart';
+import 'package:viovid/features/dashboard_management/cubit/user_register/user_register_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/user_register/user_register_list_state.dart';
 
 class UserRegistChart extends StatefulWidget {
-  const UserRegistChart({super.key, required this.data});
+  const UserRegistChart({super.key});
 
-  final List<int> data;
+  // final List<int> data;
 
   @override
   State<UserRegistChart> createState() => _UserRegistChartState();
@@ -17,7 +21,79 @@ class _UserRegistChartState extends State<UserRegistChart> {
   int _highestNum = 90;
 
   @override
+  void initState() {
+    super.initState();
+    context.read<UserRegisterListCubit>().getUserRegist(selectedYear);
+  }
+
+  void handleChangeYear() async {
+    context.read<UserRegisterListCubit>().getUserRegist(selectedYear);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return BlocConsumer<UserRegisterListCubit, UserRegisterListState>(
+      listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
+      listener: (ctx, state) {
+        if (state.errorMessage.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ErrorDialog(errorMessage: state.errorMessage),
+          );
+        }
+      },
+      builder: (ctx, state) {
+        if (state.isLoading) {
+          return _buildInProgressWidget();
+        }
+        if (state.usersRegistered != null) {
+          return _buildUserRegisterdList(state.usersRegistered!);
+        }
+        if (state.errorMessage.isNotEmpty) {
+          return _buildFailureWidget(state.errorMessage);
+        }
+        return const SizedBox();
+      },
+    );
+  }
+
+  Widget _buildInProgressWidget() {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(),
+        Gap(14),
+        Text(
+          'Đang xử lý ...',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Gap(50),
+      ],
+    );
+  }
+
+  Widget _buildFailureWidget(String errorMessage) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserRegisterdList(List<int> users) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -36,32 +112,23 @@ class _UserRegistChartState extends State<UserRegistChart> {
               ),
               const SizedBox(height: 20),
               Expanded(
-                child: FutureBuilder<List<BarChartGroupData>>(
-                  future: _getUserRegistrationData(selectedYear),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return const Center(child: Text('Error loading data'));
-                    } else {
-                      return BarChart(
-                        BarChartData(
-                          barGroups: snapshot.data,
-                          borderData: FlBorderData(show: false),
-                          titlesData: _buildAxes(),
-                          barTouchData: BarTouchData(),
-                        ),
-                      );
-                    }
-                  },
+                  child: BarChart(
+                BarChartData(
+                  barGroups: _getUserRegistrationData(users),
+                  borderData: FlBorderData(show: false),
+                  titlesData: _buildAxes(),
+                  barTouchData: BarTouchData(),
                 ),
-              ),
+              )),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () => setState(() => selectedYear--),
+                    onPressed: () => setState(() {
+                      selectedYear--;
+                      handleChangeYear();
+                    }),
                     icon: const Icon(Icons.arrow_back),
                   ),
                   Text(
@@ -70,7 +137,10 @@ class _UserRegistChartState extends State<UserRegistChart> {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    onPressed: () => setState(() => selectedYear++),
+                    onPressed: () => setState(() {
+                      selectedYear++;
+                      handleChangeYear();
+                    }),
                     icon: const Icon(Icons.arrow_forward),
                   ),
                 ],
@@ -126,8 +196,7 @@ class _UserRegistChartState extends State<UserRegistChart> {
         },
       );
 
-  Future<List<BarChartGroupData>> _getUserRegistrationData(int year) async {
-    final data = await fetchUserRegist(selectedYear);
+  List<BarChartGroupData> _getUserRegistrationData(List<int> data) {
     _highestNum = data.reduce((a, b) => a > b ? a : b);
     return data.asMap().entries.map((entry) {
       return BarChartGroupData(x: entry.key, barRods: [

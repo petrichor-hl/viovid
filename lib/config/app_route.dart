@@ -7,6 +7,15 @@ import 'package:viovid/data/dynamic/profile_data.dart';
 import 'package:viovid/features/account_manament/cubit/account_list_cubit.dart';
 import 'package:viovid/features/account_manament/data/account_list_api_service.dart';
 import 'package:viovid/features/account_manament/data/account_list_repository.dart';
+import 'package:viovid/features/dashboard_management/cubit/payment_list/payment_list_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/top_film_list/top_film_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/user_register/user_register_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/data/payment_list/payment_list_api_service.dart';
+import 'package:viovid/features/dashboard_management/data/payment_list/payment_list_repository.dart';
+import 'package:viovid/features/dashboard_management/data/top_film_list/top_film_list_api_service.dart';
+import 'package:viovid/features/dashboard_management/data/top_film_list/top_film_list_repository.dart';
+import 'package:viovid/features/dashboard_management/data/user_register/user_register_list_api_service.dart';
+import 'package:viovid/features/dashboard_management/data/user_register/user_register_list_repository.dart';
 import 'package:viovid/features/plan_management/cubit/plan_list_cubit.dart';
 import 'package:viovid/features/plan_management/data/plan_list_api_service.dart';
 import 'package:viovid/features/plan_management/data/plan_list_repository.dart';
@@ -194,7 +203,40 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/dashboard',
           name: 'dashboard',
-          builder: (context, state) => const DashboardScreen(),
+          builder: (context, state) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => UserRegisterListCubit(
+                  UserRegisterListRepository(
+                    userRegisterListService: UserRegisterListService(dio),
+                  ),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => PaymentListCubit(
+                  PaymentListRepository(
+                    paymentListService: PaymentListService(dio),
+                  ),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => TopicManagementCubit(
+                  TopicManagementRepository(
+                    topicManagementApiService: TopicManagementApiService(dio),
+                  ),
+                ),
+              ),
+              BlocProvider(
+                create: (context) => TopFilmListCubit(
+                  TopFilmListRepository(
+                    topFlimsListService: TopFilmListService(dio),
+                  ),
+                ),
+              ),
+            ],
+            child: const DashboardScreen(),
+          ),
+          // builder: (context, state) => const DashboardScreen(),
         ),
         GoRoute(
           path: '/admin/plan-management',

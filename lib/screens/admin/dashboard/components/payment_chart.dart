@@ -1,24 +1,98 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/models/dto/dto_payment.dart';
-import 'package:viovid/service/service.dart';
+import 'package:viovid/base/components/error_dialog.dart';
+import 'package:viovid/features/dashboard_management/cubit/payment_list/payment_list_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/payment_list/payment_list_list_state.dart';
+import 'package:viovid/features/dashboard_management/dtos/payment_dto.dart';
 
 class PaymentChart extends StatefulWidget {
-  const PaymentChart({super.key, required this.selectedYear});
-  final int selectedYear;
+  const PaymentChart({super.key});
 
   @override
   State<PaymentChart> createState() => _PaymentChartState();
 }
 
 class _PaymentChartState extends State<PaymentChart> {
-  late Future<List<BarChartGroupData>> paymentDataFuture;
   int selectedYear = 2025;
-  double _highestNum = 250;
+  double _highestNum = 10000;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<PaymentListCubit>().getPaymentsList(selectedYear);
+  }
+
+  void handleChangeYear() async {
+    context.read<PaymentListCubit>().getPaymentsList(selectedYear);
+  }
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<PaymentListCubit, PaymentListState>(
+      listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
+      listener: (ctx, state) {
+        if (state.errorMessage.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ErrorDialog(errorMessage: state.errorMessage),
+          );
+        }
+      },
+      builder: (ctx, state) {
+        if (state.isLoading) {
+          return _buildInProgressWidget();
+        }
+        if (state.payments != null) {
+          return _buildPaymentList(_getPaymentData(state.payments!));
+        }
+        if (state.errorMessage.isNotEmpty) {
+          return _buildFailureWidget(state.errorMessage);
+        }
+        return const SizedBox();
+      },
+    );
+  }
+
+  Widget _buildInProgressWidget() {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(),
+        Gap(14),
+        Text(
+          'Đang xử lý ...',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Gap(50),
+      ],
+    );
+  }
+
+  Widget _buildFailureWidget(String errorMessage) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentList(List<BarChartGroupData> payments) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -37,28 +111,16 @@ class _PaymentChartState extends State<PaymentChart> {
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: FutureBuilder<List<BarChartGroupData>>(
-                  future: _getPaymentData(selectedYear),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return const Center(child: Text('Error loading data'));
-                    } else {
-                      return BarChart(
-                        BarChartData(
-                          maxY: _highestNum,
-                          groupsSpace: 12,
-                          barGroups: snapshot.data,
-                          borderData: FlBorderData(show: false),
-                          titlesData: _buildAxes(),
-                          barTouchData: BarTouchData(),
-                        ),
-                      );
-                    }
-                  },
+                  child: BarChart(
+                BarChartData(
+                  maxY: _highestNum,
+                  groupsSpace: 12,
+                  barGroups: payments,
+                  borderData: FlBorderData(show: false),
+                  titlesData: _buildAxes(),
+                  barTouchData: BarTouchData(),
                 ),
-              ),
+              )),
               const SizedBox(height: 8),
               _buildNote(),
               const SizedBox(height: 8),
@@ -66,7 +128,10 @@ class _PaymentChartState extends State<PaymentChart> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () => setState(() => selectedYear--),
+                    onPressed: () => setState(() {
+                      selectedYear--;
+                      handleChangeYear();
+                    }),
                     icon: const Icon(Icons.arrow_back),
                   ),
                   Text(
@@ -75,7 +140,10 @@ class _PaymentChartState extends State<PaymentChart> {
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    onPressed: () => setState(() => selectedYear++),
+                    onPressed: () => setState(() {
+                      selectedYear++;
+                      handleChangeYear();
+                    }),
                     icon: const Icon(Icons.arrow_forward),
                   ),
                 ],
@@ -109,19 +177,16 @@ class _PaymentChartState extends State<PaymentChart> {
         topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)));
   }
 
-  Future<List<BarChartGroupData>> _getPaymentData(int year) async {
+  List<BarChartGroupData> _getPaymentData(List<PaymentDto> data) {
     try {
-      List<DtoPayment> payments = await fetchPayments(year);
       // Add demo data
       if (selectedYear == 2024) {
-        payments
-            .add(const DtoPayment(month: 10, type: 'wallet', amount: 100000));
+        data.add(const PaymentDto(month: 10, type: 'wallet', amount: 100000));
       }
       if (selectedYear == 2025) {
-        payments.add(const DtoPayment(month: 1, type: 'wallet', amount: 90000));
+        data.add(const PaymentDto(month: 1, type: 'wallet', amount: 90000));
       }
-      _highestNum =
-          payments.map((p) => p.amount).reduce((a, b) => a > b ? a : b);
+      _highestNum = data.map((p) => p.amount).reduce((a, b) => a > b ? a : b);
       // Group payments by month
       Map<int, Map<String, double>> groupedPayments = {
         0: {},
@@ -129,7 +194,7 @@ class _PaymentChartState extends State<PaymentChart> {
         2: {},
         3: {},
       };
-      for (var payment in payments) {
+      for (var payment in data) {
         int quarter = (payment.month - 1) ~/ 3;
         if (!groupedPayments[quarter]!.containsKey(payment.type)) {
           groupedPayments[quarter]![payment.type] = 0;
@@ -140,8 +205,8 @@ class _PaymentChartState extends State<PaymentChart> {
 
       // Convert grouped payments to BarChartGroupData
       List<BarChartGroupData> barChartData = [];
-      groupedPayments.forEach((quarter, payments) {
-        List<BarChartRodData> rods = payments.entries.map((entry) {
+      groupedPayments.forEach((quarter, data) {
+        List<BarChartRodData> rods = data.entries.map((entry) {
           return BarChartRodData(
             toY: entry.value,
             width: 15, // Adjust the width of each bar

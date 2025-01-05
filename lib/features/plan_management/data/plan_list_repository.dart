@@ -38,7 +38,6 @@ class PlanListRepository {
       );
     } catch (error) {
       log('$error');
-      print(error);
       return Failure('$error');
     }
   }

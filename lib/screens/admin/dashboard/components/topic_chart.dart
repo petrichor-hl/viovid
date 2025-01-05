@@ -1,17 +1,17 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/models/dto/dto_topic.dart';
+import 'package:viovid/base/components/error_dialog.dart';
+import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
+import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
+import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
 
 class TopicPieChart extends StatefulWidget {
   const TopicPieChart({
     super.key,
-    required this.palette,
-    required this.data,
   });
-
-  final List<Color> palette;
-  final List<DtoTopic> data;
 
   @override
   State<TopicPieChart> createState() => _TopicPieChartState();
@@ -21,6 +21,14 @@ class _TopicPieChartState extends State<TopicPieChart> {
   int touchedIndex = -1;
   bool isDrawerOpen = false; // Controls whether the drawer is visible
   int? selectedDataIndex; // Tracks the clicked slice index
+  List<Color> palette = const [
+    Color.fromARGB(255, 130, 2, 98),
+    Color.fromARGB(255, 41, 23, 32),
+    Color.fromARGB(255, 193, 42, 90),
+    Color.fromARGB(255, 4, 167, 118),
+    Color.fromARGB(255, 255, 209, 102),
+    Color.fromARGB(255, 255, 81, 81),
+  ];
 
   void toggleDrawer([int? index]) {
     setState(() {
@@ -33,7 +41,75 @@ class _TopicPieChartState extends State<TopicPieChart> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<TopicManagementCubit>().getTopicList();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return BlocConsumer<TopicManagementCubit, TopicManagementState>(
+      listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
+      listener: (ctx, state) {
+        if (state.errorMessage.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ErrorDialog(errorMessage: state.errorMessage),
+          );
+        }
+      },
+      builder: (ctx, state) {
+        if (state.isLoading) {
+          return _buildInProgressWidget();
+        }
+        if (state.topics != null) {
+          return _buildTopicChart(state.topics!);
+        }
+        if (state.errorMessage.isNotEmpty) {
+          return _buildFailureWidget(state.errorMessage);
+        }
+        return const SizedBox();
+      },
+    );
+  }
+
+  Widget _buildInProgressWidget() {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(),
+        Gap(14),
+        Text(
+          'Đang xử lý ...',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Gap(50),
+      ],
+    );
+  }
+
+  Widget _buildFailureWidget(String errorMessage) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopicChart(List<TopicDto> topics) {
     return Stack(
       children: [
         Column(
@@ -82,20 +158,18 @@ class _TopicPieChartState extends State<TopicPieChart> {
                       sectionsSpace: 0,
                       centerSpaceRadius: 70,
                       sections: List.generate(
-                        widget.data.length,
+                        topics.length,
                         (index) => PieChartSectionData(
-                          value: (widget.data[index].films?.length ?? 0)
-                              .toDouble(),
+                          value: (topics[index].films.length).toDouble(),
                           radius: touchedIndex == index ? 60 : 40 - index * 2.0,
-                          title: (widget.data[index].films?.length ?? 0)
-                              .toString(),
+                          title: (topics[index].films.length).toString(),
                           showTitle: touchedIndex == index,
                           titleStyle: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
-                          color: widget.palette[index % widget.palette.length],
+                          color: palette[index % palette.length],
                         ),
                       ),
                     ),
@@ -105,7 +179,7 @@ class _TopicPieChartState extends State<TopicPieChart> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "${widget.data.length}",
+                          "${topics.length}",
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium!
@@ -138,7 +212,7 @@ class _TopicPieChartState extends State<TopicPieChart> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: List.generate(
-                      widget.data.length,
+                      topics.length,
                       (index) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Row(
@@ -147,15 +221,14 @@ class _TopicPieChartState extends State<TopicPieChart> {
                               width: 20,
                               height: 20,
                               decoration: BoxDecoration(
-                                color: widget
-                                    .palette[index % widget.palette.length],
+                                color: palette[index % palette.length],
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                widget.data[index].name,
+                                topics[index].name,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -208,7 +281,7 @@ class _TopicPieChartState extends State<TopicPieChart> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      "Danh sách phim ${widget.data[selectedDataIndex!].name}",
+                      "Danh sách phim ${topics[selectedDataIndex!].name}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -218,11 +291,11 @@ class _TopicPieChartState extends State<TopicPieChart> {
                 if (selectedDataIndex != null)
                   Expanded(
                     child: ListView.builder(
-                      itemCount: widget.data[selectedDataIndex!].films!.length,
+                      itemCount: topics[selectedDataIndex!].films.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(widget
-                              .data[selectedDataIndex!].films![index].name),
+                          title: Text(
+                              topics[selectedDataIndex!].films[index].name),
                         );
                       },
                     ),

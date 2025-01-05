@@ -57,7 +57,6 @@ class PlanListApiService {
           'duration': plan.duration,
         },
       );
-      print("response $response");
       if (response.containsKey('id')) {
         return true;
       } else {

@@ -89,7 +89,7 @@ class _EditPlanDialogState extends State<EditPlanDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.editPlan!.name;
+    _nameController.text = widget.editPlan.name;
     _priceController.text = _formatter
         .formatEditUpdate(TextEditingValue.empty,
             TextEditingValue(text: widget.editPlan.price.toString()))
