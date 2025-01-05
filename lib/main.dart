@@ -51,6 +51,43 @@ class MyApp extends StatelessWidget {
           thumbColor: primaryColor,
           valueIndicatorColor: primaryColor,
         ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            fixedSize: const Size.fromHeight(48),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: MaterialStateOutlineInputBorder.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.focused)) {
+                return const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                  borderSide: BorderSide(color: Color(0xFF695CFE), width: 2),
+                );
+              } else if (states.contains(WidgetState.hovered)) {
+                return OutlineInputBorder(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(8),
+                  ),
+                  borderSide: BorderSide(
+                      color: const Color(0xFF695CFE).withOpacity(0.3),
+                      width: 1),
+                );
+              }
+              return const OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8),
+                ),
+                borderSide: BorderSide(color: Colors.black26),
+              );
+            },
+          ),
+        ),
       ),
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,

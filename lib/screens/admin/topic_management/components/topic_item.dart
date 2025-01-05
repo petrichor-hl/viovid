@@ -19,11 +19,9 @@ class TopicItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       hoverColor: Colors.transparent,
-      onTap: () => context
-          .go('${GoRouterState.of(context).uri}/${topic.topicId}', extra: {
-        // 'filmName': selectedFilm.name,
-        // 'seasons': selectedFilm.seasons,
-      }),
+      onTap: () => context.go(
+        '${GoRouterState.of(context).uri}/${topic.topicId}',
+      ),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),

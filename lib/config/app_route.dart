@@ -19,6 +19,12 @@ import 'package:viovid/features/dashboard_management/data/user_register/user_reg
 import 'package:viovid/features/plan_management/cubit/plan_list_cubit.dart';
 import 'package:viovid/features/plan_management/data/plan_list_api_service.dart';
 import 'package:viovid/features/plan_management/data/plan_list_repository.dart';
+import 'package:viovid/features/film_management/cubit/film_management_cubit.dart';
+import 'package:viovid/features/film_management/data/film_management_api_service.dart';
+import 'package:viovid/features/film_management/data/film_management_repository.dart';
+import 'package:viovid/features/topic_detail/cubit/topic_detail_cubit.dart';
+import 'package:viovid/features/topic_detail/data/topic_detail_api_service.dart';
+import 'package:viovid/features/topic_detail/data/topic_detail_repository.dart';
 import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
 import 'package:viovid/features/topic_management/data/topic_management_api_service.dart';
 import 'package:viovid/features/topic_management/data/topic_management_repository.dart';
@@ -27,9 +33,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 import 'package:viovid/screens/admin/account-management/account_management.dart';
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
-import 'package:viovid/screens/admin/film_management/film_management.dart';
+import 'package:viovid/screens/admin/film_management/create_film/create_film.screen.dart';
+import 'package:viovid/screens/admin/film_management/film_management.screen.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
-import 'package:viovid/screens/admin/topic_management/topic_detail.dart';
+import 'package:viovid/screens/admin/topic_management/topic_detail/topic_detail.screen.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
 // import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 // import 'package:viovid/screens/admin/account-management/account_management.dart';
@@ -253,27 +260,28 @@ GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/admin/film-management',
           name: 'film-management',
-          builder: (context, state) => const FilmManagementScreen(),
-          // routes: [
-          //   GoRoute(
-          //     path: 'add',
-          //     name: 'add-film',
-          //     builder: (context, state) => const AddFilm(),
-          //   ),
-          //   GoRoute(
-          //     path: 'edit/:filmId',
-          //     name: 'edit-film',
-          //     // builder: (context, state) => EditFilm(
-          //     //   filmId: state.pathParameters['filmId']!,
-          //     // ),
-          //     builder: (ctx, state) => RepositoryProvider(
-          //       create: (context) => SelectedFilmRepo(),
-          //       child: EditFilm(
-          //         filmId: state.pathParameters['filmId']!,
-          //       ),
-          //     ),
-          //   )
-          // ],
+          builder: (context, state) => BlocProvider(
+            create: (context) => FilmManagementCubit(
+              FilmManagementRepository(
+                topicManagementApiService: FilmManagementApiService(dio),
+              ),
+            ),
+            child: const FilmManagementScreen(),
+          ),
+          routes: [
+            GoRoute(
+              path: 'add',
+              name: 'add-film',
+              builder: (context, state) => const CreateFilmScreen(),
+            ),
+            GoRoute(
+              path: 'edit/:filmId',
+              name: 'edit-film',
+              builder: (context, state) {
+                return const Placeholder();
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/admin/topic-management',
@@ -290,7 +298,18 @@ GoRouter appRouter = GoRouter(
             GoRoute(
               path: ':topicId',
               name: 'topic-detail',
-              builder: (context, state) => const TopicDetailScreen(),
+              builder: (context, state) {
+                return BlocProvider(
+                  create: (context) => TopicDetailCubit(
+                    TopicDetailRepository(
+                      topicDetailApiService: TopicDetailApiService(dio),
+                    ),
+                  ),
+                  child: TopicDetailScreen(
+                    topicId: state.pathParameters['topicId']!,
+                  ),
+                );
+              },
             ),
           ],
         ),

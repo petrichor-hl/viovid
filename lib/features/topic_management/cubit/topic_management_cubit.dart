@@ -101,7 +101,6 @@ class TopicManagementCubit extends Cubit<TopicManagementState> {
                     ? TopicDto(
                         topicId: topic.topicId,
                         name: editedTopicName,
-                        films: topic.films,
                       )
                     : topic)
                 .toList(),
