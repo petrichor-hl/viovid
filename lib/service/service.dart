@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:viovid/config/api.config.dart';
 import 'package:viovid/models/dto/dto_film.dart';
 import 'package:viovid/models/dto/dto_payment.dart';
-import 'package:viovid/models/dto/dto_plan.dart';
 import 'package:viovid/models/dto/dto_sign_in_response.dart';
 import 'package:viovid/models/dto/dto_top_view_film.dart';
 import 'package:viovid/models/dto/dto_topic.dart';
@@ -172,99 +171,5 @@ Future<List<DtoTopViewFilm>> fetchTopViewFilms(int num) async {
   } catch (e) {
     print(e);
     throw Exception('Failed to load top view films');
-  }
-}
-
-Future<List<DtoPlan>> fetchPlans() async {
-  try {
-    final response = await http.get(
-      Uri.parse('$url/Plan'),
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-      if (responseData['succeeded'] == true) {
-        List<dynamic> result = responseData['result'];
-        return result.map((e) => DtoPlan.fromMap(e)).toList();
-      } else {
-        throw Exception('Failed to load plans');
-      }
-    } else {
-      throw Exception('Failed to load plans');
-    }
-  } catch (e) {
-    print(e);
-    throw Exception('Failed to load plans');
-  }
-}
-
-Future<String> createPlan(DtoPlan plan) async {
-  final Map<String, dynamic> body = {
-    'name': plan.name,
-    'price': plan.price,
-    'duration': plan.duration,
-  };
-  try {
-    final response = await http.post(
-      Uri.parse('$url/Plan'),
-      headers: headers,
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-      if (responseData['succeeded'] == true) {
-        return responseData['result']['id'];
-      } else {
-        throw Exception('Failed to create plan');
-      }
-    } else {
-      throw Exception('Failed to create plan');
-    }
-  } catch (e) {
-    print(e);
-    throw Exception('Failed to create plan');
-  }
-}
-
-Future<bool> editPlan(DtoPlan plan) async {
-  final Map<String, dynamic> body = {
-    'name': plan.name,
-    'price': plan.price,
-    'duration': plan.duration,
-  };
-  try {
-    final response = await http.put(
-      Uri.parse('$url/Plan/${plan.id}'),
-      headers: headers,
-      body: jsonEncode(body),
-    );
-
-    if (response.statusCode != 200) {
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-      return responseData['succeeded'];
-    }
-    return false;
-  } catch (e) {
-    print(e);
-    throw Exception('Failed to edit plan');
-  }
-}
-
-Future<bool> deletePlan(String id) async {
-  try {
-    final response = await http.delete(
-      Uri.parse('$url/Plan/$id'),
-      headers: headers,
-    );
-
-    if (response.statusCode != 200) {
-      final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-      return responseData['succeeded'];
-    }
-    return false;
-  } catch (e) {
-    print(e);
-    throw Exception('Failed to delete plan');
   }
 }

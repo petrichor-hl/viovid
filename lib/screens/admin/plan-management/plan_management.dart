@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:viovid/base/common_variables.dart';
-import 'package:viovid/models/dto/dto_plan.dart';
+import 'package:viovid/base/components/confirm_dialog.dart';
+import 'package:viovid/base/components/error_dialog.dart';
+import 'package:viovid/features/plan_management/cubit/plan_list_cubit.dart';
+import 'package:viovid/features/plan_management/cubit/plan_list_state.dart';
+import 'package:viovid/features/plan_management/dtos/plan_dto.dart';
 import 'package:viovid/screens/admin/dashboard/components/header.dart';
-import 'package:viovid/screens/admin/plan-management/components/add_edit_subscription_dialog.dart';
-import 'package:viovid/service/service.dart';
+import 'package:viovid/screens/admin/plan-management/components/add_plan_dialog.dart';
+import 'package:viovid/screens/admin/plan-management/components/edit_plan_dialog.dart';
 
 class PlanManagementScreen extends StatefulWidget {
   const PlanManagementScreen({super.key});
@@ -16,76 +21,82 @@ class PlanManagementScreen extends StatefulWidget {
 class _PlanManagementScreenState extends State<PlanManagementScreen> {
   int _selectedRow = -1;
   // ignore: non_constant_identifier_names
-  late List<DtoPlan> _UserRows;
   TextStyle cellTextStyle = const TextStyle(
     color: Colors.black,
     fontWeight: FontWeight.bold,
     fontSize: 16,
   );
 
-  late final Future<void> _futureRecentUsers = _getRecentUsers();
-  Future<void> _getRecentUsers() async {
-    await Future.delayed(kTabScrollDuration);
-    _UserRows = await fetchPlans();
-  }
-
-  Future<void> _logicAddStaff() async {
-    DtoPlan? newUser = await showDialog(
-      context: context,
-      builder: (ctx) => const AddEditSubscriptionDialog(),
-    );
-
-    if (newUser != null) {
-      setState(() {
-        _UserRows.add(newUser);
-      });
-    }
-  }
-
-  Future<void> _logicEditStaff() async {
-    String? message = await showDialog(
-      context: context,
-      builder: (ctx) => AddEditSubscriptionDialog(
-        editPlan: _UserRows[_selectedRow],
-      ),
-    );
-
-    // print(message);
-    if (message == "updated") {
-      setState(() {});
-    }
-  }
-
-  Future<void> _logicDeleteStaff(BuildContext ctx) async {
-    var deleteUserName = _UserRows[_selectedRow].name;
-
-    /* Xóa dòng dữ liệu*/
-    await deletePlan(_UserRows[_selectedRow].id!);
-
-    // print('totalPage = $totalPages');
-
-    _UserRows.removeAt(_selectedRow);
-    _selectedRow = -1;
-    setState(() {});
-
-    if (mounted) {
-      Navigator.of(ctx).pop();
-      ScaffoldMessenger.of(ctx).clearSnackBars();
-      ScaffoldMessenger.of(ctx).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Xoá gói $deleteUserName.',
-            textAlign: TextAlign.center,
-          ),
-          behavior: SnackBarBehavior.floating,
-          width: 400,
-        ),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    context.read<PlanListCubit>().getPlanList();
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<PlanListCubit, PlanListState>(
+      listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
+      listener: (ctx, state) {
+        if (state.errorMessage.isNotEmpty) {
+          showDialog(
+            context: context,
+            builder: (ctx) => ErrorDialog(errorMessage: state.errorMessage),
+          );
+        }
+      },
+      builder: (ctx, state) {
+        if (state.isLoading) {
+          return _buildInProgressWidget();
+        }
+        if (state.plans != null) {
+          return _buildPlanManagement(state.plans!);
+        }
+        if (state.errorMessage.isNotEmpty) {
+          return _buildFailureWidget(state.errorMessage);
+        }
+        return const SizedBox();
+      },
+    );
+  }
+
+  Widget _buildInProgressWidget() {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(),
+        Gap(14),
+        Text(
+          'Đang xử lý ...',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Gap(50),
+      ],
+    );
+  }
+
+  Widget _buildFailureWidget(String errorMessage) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlanManagement(List<PlanDto> plans) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -106,7 +117,15 @@ class _PlanManagementScreenState extends State<PlanManagementScreen> {
                 ),
                 const Spacer(),
                 FilledButton.icon(
-                  onPressed: _logicAddStaff,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => BlocProvider.value(
+                        value: context.read<PlanListCubit>(),
+                        child: AddPlanDialog(),
+                      ),
+                    );
+                  },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.all(20),
                     shape: RoundedRectangleBorder(
@@ -129,7 +148,24 @@ class _PlanManagementScreenState extends State<PlanManagementScreen> {
                 ),
                 const Gap(20),
                 FilledButton.icon(
-                  onPressed: _selectedRow == -1 ? null : _logicEditStaff,
+                  onPressed: _selectedRow == -1
+                      ? null
+                      : () async {
+                          await showDialog(
+                            context: context,
+                            builder: (ctx) => BlocProvider.value(
+                              value: context.read<PlanListCubit>(),
+                              child: EditPlanDialog(
+                                editPlan: plans[_selectedRow],
+                                planId: plans[_selectedRow].id!,
+                              ),
+                            ),
+                          );
+                          setState(() {
+                            _selectedRow = -1;
+                            context.read<PlanListCubit>().getPlanList();
+                          });
+                        },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.all(20),
                     shape: RoundedRectangleBorder(
@@ -155,35 +191,19 @@ class _PlanManagementScreenState extends State<PlanManagementScreen> {
                 FilledButton.icon(
                   onPressed: _selectedRow == -1
                       ? null
-                      : () async {
-                          await showDialog(
+                      : () {
+                          showDialog(
                             context: context,
-                            builder: (ctx) => AlertDialog(
-                              backgroundColor: Colors.white,
-                              title: const Text('Xác nhận'),
-                              content: Text(
-                                  'Bạn muốn xoá gói ${_UserRows[_selectedRow].name}?'),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(ctx).pop();
-                                  },
-                                  child: const Text('Huỷ'),
-                                ),
-                                FilledButton(
-                                  onPressed: () => _logicDeleteStaff(ctx),
-                                  child: const Text('Đồng ý'),
-                                ),
-                              ],
+                            builder: (ctx) => ConfirmDialog(
+                              confirmMessage: 'Bạn có chắc muốn xoá Gói này',
+                              onConfirm: () => context
+                                  .read<PlanListCubit>()
+                                  .deletePlan(plans[_selectedRow].id!),
                             ),
                           );
-
-                          if (_selectedRow >= _UserRows.length) {
+                          setState(() {
                             _selectedRow = -1;
-                          }
+                          });
                         },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.all(20),
@@ -215,175 +235,148 @@ class _PlanManagementScreenState extends State<PlanManagementScreen> {
             const SizedBox(height: 10),
             Expanded(
               child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                child: FutureBuilder(
-                  future: _futureRecentUsers,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 30,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: secondary200,
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 80,
+                              child: Text('STT', style: cellTextStyle),
                             ),
-                            decoration: const BoxDecoration(
-                              color: secondary200,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  child: Text('STT', style: cellTextStyle),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                    ),
-                                    child:
-                                        Text('Tên gói', style: cellTextStyle),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                    ),
-                                    child: Text('Giá', style: cellTextStyle),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                    ),
-                                    child: Text('Thời gian hiệu lực',
-                                        style: cellTextStyle),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Gap(10),
-                          Expanded(
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                child: Text('Tên gói', style: cellTextStyle),
                               ),
-                              child: ListView.separated(
-                                itemCount: _UserRows.length,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(
-                                  color: neutral100,
-                                  thickness: 1,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
                                 ),
-                                itemBuilder: (context, index) {
-                                  return Ink(
-                                    color: _selectedRow == index
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.1)
-                                        : null,
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedRow = index;
-                                        });
-                                      },
-                                      onLongPress: () async {
-                                        setState(() {
-                                          _selectedRow = index;
-                                        });
-                                        _logicEditStaff();
-                                      },
-                                      child: Row(
-                                        children: [
-                                          const Gap(30),
-                                          SizedBox(
-                                            width: 80,
-                                            child: Text(
-                                              (index + 1).toString(),
-                                            ),
+                                child: Text('Giá', style: cellTextStyle),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 15,
+                                ),
+                                child: Text('Thời gian hiệu lực',
+                                    style: cellTextStyle),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Gap(10),
+                      Expanded(
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: ListView.separated(
+                            itemCount: plans.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              color: neutral100,
+                              thickness: 1,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Ink(
+                                color: _selectedRow == index
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withOpacity(0.1)
+                                    : null,
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedRow = index;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      const Gap(30),
+                                      SizedBox(
+                                        width: 80,
+                                        child: Text(
+                                          (index + 1).toString(),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 15,
+                                            horizontal: 15,
                                           ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 15,
-                                                horizontal: 15,
-                                              ),
-                                              child: Text(
-                                                _UserRows[index].name,
-                                              ),
-                                            ),
+                                          child: Text(
+                                            plans[index].name,
                                           ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 15,
-                                              ),
-                                              child: Text(
-                                                _UserRows[index]
-                                                    .price
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 15,
+                                          ),
+                                          child: Text(
+                                            plans[index].price.toString(),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 15,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                plans[index]
+                                                    .duration
                                                     .toString(),
                                               ),
-                                            ),
+                                              const Spacer(),
+                                              if (_selectedRow == index)
+                                                Icon(
+                                                  Icons.check,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                )
+                                            ],
                                           ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 15,
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    _UserRows[index]
-                                                        .duration
-                                                        .toString(),
-                                                  ),
-                                                  const Spacer(),
-                                                  if (_selectedRow == index)
-                                                    Icon(
-                                                      Icons.check,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                    )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          const Gap(30),
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
+                                      const Gap(30),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        ],
-                      );
-                    }
-                  },
-                ),
-              ),
+                        ),
+                      ),
+                    ],
+                  )),
             ),
           ],
         ),
