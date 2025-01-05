@@ -9,11 +9,14 @@ import 'package:viovid/features/account_manament/data/account_list_api_service.d
 import 'package:viovid/features/account_manament/data/account_list_repository.dart';
 import 'package:viovid/features/dashboard_management/cubit/payment_list/payment_list_list_cubit.dart';
 import 'package:viovid/features/dashboard_management/cubit/top_film_list/top_film_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/topic_list/topic_list_cubit.dart';
 import 'package:viovid/features/dashboard_management/cubit/user_register/user_register_list_cubit.dart';
 import 'package:viovid/features/dashboard_management/data/payment_list/payment_list_api_service.dart';
 import 'package:viovid/features/dashboard_management/data/payment_list/payment_list_repository.dart';
 import 'package:viovid/features/dashboard_management/data/top_film_list/top_film_list_api_service.dart';
 import 'package:viovid/features/dashboard_management/data/top_film_list/top_film_list_repository.dart';
+import 'package:viovid/features/dashboard_management/data/topic_list/topic_list_api_service.dart';
+import 'package:viovid/features/dashboard_management/data/topic_list/topic_list_repository.dart';
 import 'package:viovid/features/dashboard_management/data/user_register/user_register_list_api_service.dart';
 import 'package:viovid/features/dashboard_management/data/user_register/user_register_list_repository.dart';
 import 'package:viovid/features/plan_management/cubit/plan_list_cubit.dart';
@@ -227,9 +230,9 @@ GoRouter appRouter = GoRouter(
                 ),
               ),
               BlocProvider(
-                create: (context) => TopicManagementCubit(
-                  TopicManagementRepository(
-                    topicManagementApiService: TopicManagementApiService(dio),
+                create: (context) => TopicListCubit(
+                  TopicListRepository(
+                    topicListApiService: TopicListApiService(dio),
                   ),
                 ),
               ),

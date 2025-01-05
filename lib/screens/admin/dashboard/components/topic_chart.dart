@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/base/components/error_dialog.dart';
-import 'package:viovid/features/topic_management/cubit/topic_management_cubit.dart';
-import 'package:viovid/features/topic_management/cubit/topic_management_state.dart';
-import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
+import 'package:viovid/features/dashboard_management/cubit/topic_list/topic_list_cubit.dart';
+import 'package:viovid/features/dashboard_management/cubit/topic_list/topic_list_state.dart';
+import 'package:viovid/features/dashboard_management/dtos/browse_topic_dto.dart';
 
 class TopicPieChart extends StatefulWidget {
   const TopicPieChart({
@@ -43,12 +43,12 @@ class _TopicPieChartState extends State<TopicPieChart> {
   @override
   void initState() {
     super.initState();
-    context.read<TopicManagementCubit>().getTopicList();
+    context.read<TopicListCubit>().getBrowseTopicList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<TopicManagementCubit, TopicManagementState>(
+    return BlocConsumer<TopicListCubit, TopicListState>(
       listenWhen: (previous, current) => current.errorMessage.isNotEmpty,
       listener: (ctx, state) {
         if (state.errorMessage.isNotEmpty) {
@@ -109,7 +109,7 @@ class _TopicPieChartState extends State<TopicPieChart> {
     );
   }
 
-  Widget _buildTopicChart(List<TopicDto> topics) {
+  Widget _buildTopicChart(List<BrowseTopicDto> topics) {
     return Stack(
       children: [
         Column(
