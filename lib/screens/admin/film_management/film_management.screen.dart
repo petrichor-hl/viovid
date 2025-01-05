@@ -25,10 +25,18 @@ class _FilmManagementScreenState extends State<FilmManagementScreen> {
         .getFilmList(searchText: _controller.text);
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   context.read<FilmManagementCubit>().getFilmList();
+  // }
+
   @override
-  void initState() {
-    super.initState();
-    context.read<FilmManagementCubit>().getFilmList();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (GoRouterState.of(context).fullPath == '/admin/film-management') {
+      context.read<FilmManagementCubit>().getFilmList();
+    }
   }
 
   @override
@@ -109,7 +117,9 @@ class _FilmManagementScreenState extends State<FilmManagementScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               FilledButton(
-                onPressed: () => context.push('/admin/film-management/add'),
+                onPressed: () => context.go(
+                  '${GoRouterState.of(context).uri}/add',
+                ),
                 style: IconButton.styleFrom(
                   fixedSize: const Size.fromHeight(48),
                   foregroundColor: Colors.white,
@@ -118,9 +128,15 @@ class _FilmManagementScreenState extends State<FilmManagementScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Thêm',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: const Row(
+                  spacing: 4,
+                  children: [
+                    Icon(Icons.add_rounded),
+                    Text(
+                      'Thêm',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),

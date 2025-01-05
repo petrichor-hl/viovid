@@ -1,40 +1,32 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:viovid/config/api.config.dart';
 import 'package:viovid/features/api_client.dart';
-import 'package:viovid/features/topic_detail/cubit/topic_detail_cubit.dart';
-import 'package:viovid/features/topic_management/dtos/simple_film.dart';
-import 'package:viovid/models/paging.dart';
+import 'package:viovid/features/topic_management/dtos/topic_dto.dart';
 
-class UpdateListFilmTopicDialog extends StatefulWidget {
-  const UpdateListFilmTopicDialog({super.key});
+class UpdateListTopicDialog extends StatefulWidget {
+  const UpdateListTopicDialog({
+    super.key,
+    required this.selectedTopics,
+  });
+
+  final List<TopicDto> selectedTopics;
 
   @override
-  State<UpdateListFilmTopicDialog> createState() =>
-      _UpdateListFilmTopicDialogState();
+  State<UpdateListTopicDialog> createState() => _UpdateListTopicDialogState();
 }
 
-class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
-  late final _topicDetail = context.read<TopicDetailCubit>().state.topicDetail!;
-
-  Future<List<SimpleFilm>> _fetchAllFilms() async {
+class _UpdateListTopicDialogState extends State<UpdateListTopicDialog> {
+  Future<List<TopicDto>> _getTopicList() async {
     try {
-      final result = await ApiClient(dio).request<void, Paging<SimpleFilm>>(
-        url: '/Film',
+      return await ApiClient(dio).request<void, List<TopicDto>>(
+        url: '/Topic',
         method: ApiMethod.get,
-        queryParameters: {
-          "pageIndex": 0,
-          "pageSize": 40,
-        },
-        fromJson: (resultJson) => Paging.fromJson(
-          resultJson,
-          (filmJson) => SimpleFilm.fromJson(filmJson),
-        ),
+        fromJson: (resultJson) => (resultJson as List)
+            .map((topic) => TopicDto.fromJson(topic))
+            .toList(),
       );
-
-      return result.items;
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['Errors'][0]['Message']);
@@ -42,16 +34,6 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
         throw Exception(e.message);
       }
     }
-  }
-
-  void _handleUpdateListFilm(List<SimpleFilm> selectedFilms) {
-    final updateListFilmId = selectedFilms.map((film) => film.filmId).toList();
-
-    context.read<TopicDetailCubit>().updateListFilm(
-          _topicDetail.topicId,
-          updateListFilmId,
-        );
-    context.pop();
   }
 
   @override
@@ -64,7 +46,7 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
         constraints: const BoxConstraints(maxWidth: 600, maxHeight: 800),
         padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
         child: FutureBuilder(
-          future: _fetchAllFilms(),
+          future: _getTopicList(),
           builder: (ctx, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildInProgressWidget();
@@ -120,9 +102,7 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
     );
   }
 
-  Widget _buildUpdateListFilmTopicDialog(List<SimpleFilm> allFilms) {
-    final selectedFilms = _topicDetail.films;
-
+  Widget _buildUpdateListFilmTopicDialog(List<TopicDto> allTopics) {
     return StatefulBuilder(
       builder: (context, setState) {
         return Column(
@@ -133,7 +113,7 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
               spacing: 20,
               children: [
                 const Text(
-                  'Chỉnh sửa danh sách Phim',
+                  'Chỉnh sửa danh sách Topic',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
@@ -149,26 +129,26 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
             ),
             const Divider(height: 30),
             Flexible(
-              // If you want to hide scroll indicator
-              // child: ScrollConfiguration(
-              //   behavior: const ScrollBehavior().copyWith(scrollbars: false),
               child: ListView(
-                children: allFilms
+                shrinkWrap: true,
+                children: allTopics
                     .map(
-                      (film) => CheckboxListTile(
-                        value: selectedFilms.any(
-                          (topicFilm) => topicFilm.filmId == film.filmId,
+                      (topic) => CheckboxListTile(
+                        value: widget.selectedTopics.any(
+                          (selectedTopic) =>
+                              selectedTopic.topicId == topic.topicId,
                         ),
-                        title: Text(film.name),
+                        title: Text(topic.name),
                         onChanged: (isChecked) {
                           setState(() {
                             if (isChecked == true) {
                               // Thêm phim vào danh sách nếu được chọn
-                              selectedFilms.add(film);
+                              widget.selectedTopics.add(topic);
                             } else {
                               // Xóa phim khỏi danh sách nếu bỏ chọn
-                              selectedFilms.removeWhere(
-                                (topicFilm) => topicFilm.filmId == film.filmId,
+                              widget.selectedTopics.removeWhere(
+                                (selectedTopic) =>
+                                    selectedTopic.topicId == topic.topicId,
                               );
                             }
                           });
@@ -181,7 +161,7 @@ class _UpdateListFilmTopicDialogState extends State<UpdateListFilmTopicDialog> {
             ),
             const Divider(height: 30),
             FilledButton(
-              onPressed: () => _handleUpdateListFilm(selectedFilms),
+              onPressed: () => context.pop(),
               style: FilledButton.styleFrom(
                 fixedSize: const Size.fromHeight(48),
                 foregroundColor: Colors.white,

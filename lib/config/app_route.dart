@@ -21,7 +21,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:viovid/screens/admin/_layout/admin_layout.dart';
 import 'package:viovid/screens/admin/account-management/account_management.dart';
 import 'package:viovid/screens/admin/dashboard/dashboard.dart';
-import 'package:viovid/screens/admin/film_management/film_management.dart';
+import 'package:viovid/screens/admin/film_management/create_film/create_film.screen.dart';
+import 'package:viovid/screens/admin/film_management/film_management.screen.dart';
 import 'package:viovid/screens/admin/plan-management/plan_management.dart';
 import 'package:viovid/screens/admin/topic_management/topic_detail/topic_detail.screen.dart';
 import 'package:viovid/screens/admin/topic_management/topic_management.dart';
@@ -219,9 +220,7 @@ GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'add',
               name: 'add-film',
-              builder: (context, state) {
-                return const Placeholder();
-              },
+              builder: (context, state) => const CreateFilmScreen(),
             ),
             GoRoute(
               path: 'edit/:filmId',

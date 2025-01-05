@@ -186,7 +186,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                               child: CachedNetworkImage(
                                 imageUrl: topicDetail.films[index].posterPath,
                                 height: 275,
-                                width: 225,
+                                width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
                             ),

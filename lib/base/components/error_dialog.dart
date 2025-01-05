@@ -22,7 +22,7 @@ class ErrorDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.warning_amber_outlined,
+              Icons.warning_amber_rounded,
               color: Theme.of(context).colorScheme.primary,
               size: 60,
             ),
