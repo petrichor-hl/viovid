@@ -5,6 +5,7 @@ class CreateFilmDto {
   String backdropPath;
   String contentRating;
   String releaseDate;
+  String tmdbId;
   List<CreateSeasonDto> seasons;
   List<String> genreIds;
   List<String> topicIds;
@@ -18,6 +19,7 @@ class CreateFilmDto {
     required this.backdropPath,
     required this.contentRating,
     required this.releaseDate,
+    required this.tmdbId,
     required this.seasons,
     required this.genreIds,
     required this.topicIds,
@@ -32,6 +34,7 @@ class CreateFilmDto {
         backdropPath = '',
         contentRating = '',
         releaseDate = '',
+        tmdbId = '',
         seasons = [
           CreateSeasonDto.init(),
         ],
@@ -49,6 +52,7 @@ class CreateFilmDto {
         // "releaseDate":
         //     "${releaseDate.year.toString().padLeft(4, '0')}-${releaseDate.month.toString().padLeft(2, '0')}-${releaseDate.day.toString().padLeft(2, '0')}",
         "releaseDate": releaseDate,
+        "tmdbId": tmdbId,
         "seasons": seasons.map((x) => x.toJson()).toList(),
         "genreIds": genreIds,
         "topicIds": topicIds,

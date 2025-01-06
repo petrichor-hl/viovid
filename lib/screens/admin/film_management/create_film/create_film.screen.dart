@@ -298,6 +298,11 @@ class _CreateFilmScreenState extends State<CreateFilmScreen> {
           decoration: _createInputDecoration('Ngày phát hành: YYYY/MM/DD'),
           onChanged: (value) => _createFilmData.releaseDate = value,
         ),
+        TextField(
+          style: const TextStyle(color: Colors.black),
+          decoration: _createInputDecoration('TmdbId'),
+          onChanged: (value) => _createFilmData.tmdbId = value,
+        ),
       ],
     );
   }
