@@ -240,7 +240,7 @@ class _FilmManagementScreenState extends State<FilmManagementScreen> {
                               ),
                               child: CachedNetworkImage(
                                 imageUrl: films[index].posterPath,
-                                height: 275,
+                                height: 250,
                                 width: 225,
                                 fit: BoxFit.cover,
                               ),

@@ -1,25 +1,20 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_web3_provider/ethereum.dart';
 import 'package:http/http.dart';
-import 'dart:js_interop';
-
+// import 'dart:js_interop';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:viovid/base/assets.dart';
-import 'package:viovid/base/common_variables.dart';
+// import 'package:viovid/base/common_variables.dart';
 import 'package:viovid/base/components/skeleton_loading.dart';
 import 'package:viovid/main.dart';
 import 'package:viovid/models/plan.dart';
 import 'package:viovid/payment/server/ethers.dart';
-import 'package:viovid/payment/server/metamask.dart';
 import 'package:viovid/screens/plans/components/plan_item.dart';
-import 'package:walletconnect_flutter_v2/apis/core/relay_client/json_rpc_2/src/client.dart'
-    as wc_client;
 import 'package:web3dart/contracts.dart';
-import 'package:js/js_util.dart';
 import 'package:web3dart/web3dart.dart';
 
-const _contractAddress = '0x39f13B61cEF5939A30D1ac89E1bF441a62371E7C';
+// const _contractAddress = '0x39f13B61cEF5939A30D1ac89E1bF441a62371E7C';
 const _receiverAddress = '0x8F3550A693aaDA5005061a84ee8EdA4942822B8d';
 const _sepRpcUrl =
     'https://sepolia.infura.io/v3/2682fb5ba7214f63ad1b4b90c9169b38';
@@ -32,13 +27,12 @@ class RegisterPlan extends StatefulWidget {
 }
 
 class _RegisterPlanState extends State<RegisterPlan> {
-  static const String walletAbi = 'assets/abi/abi_wallet.json';
+  // static const String walletAbi = 'assets/abi/abi_wallet.json';
   late ContractEvent contractEvent;
   late String walletAddress;
   late Web3Client ethClient;
   late Client httpClient;
-  late DeployedContract _contract;
-  MetaMaskProvider provider = MetaMaskProvider();
+  // late DeployedContract _contract;
   final int amount = 100;
   int chainId = 1;
   BrowserProvider? web3;
@@ -76,9 +70,7 @@ class _RegisterPlanState extends State<RegisterPlan> {
       httpClient = Client();
       ethClient = Web3Client(_sepRpcUrl, httpClient);
       web3 = BrowserProvider(ethereum!);
-      if (provider.isConnected) {
-        chainId = provider.currentChain;
-      }
+
       setState(() {
         // Web3 is initialized
       });
@@ -90,7 +82,6 @@ class _RegisterPlanState extends State<RegisterPlan> {
     super.initState();
     httpClient = Client();
     ethClient = Web3Client(_sepRpcUrl, httpClient);
-    provider.init();
     initWeb3();
   }
 
@@ -191,9 +182,11 @@ class _RegisterPlanState extends State<RegisterPlan> {
                                 final index = entry.key;
                                 final plan = entry.value;
                                 return PlanItem(
-                                  plan,
+                                  plan: plan,
                                   lighter: index % 2 == 1,
-                                  web3: web3,
+                                  web3: web3!,
+                                  receiverAddress: _receiverAddress,
+                                  web3client: ethClient,
                                 );
                               },
                             ),
@@ -205,35 +198,6 @@ class _RegisterPlanState extends State<RegisterPlan> {
                 ),
               ),
               const Gap(160),
-              // Ink(
-              //   padding:
-              //       const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              //   color: const Color(0xF2191C21),
-              //   child: Center(
-              //     child: FilledButton(
-              //       onPressed: () {},
-              //       style: FilledButton.styleFrom(
-              //         backgroundColor: primaryColor,
-              //         foregroundColor: Colors.white,
-              //         shape: RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.circular(8),
-              //         ),
-              //         fixedSize: const Size.fromWidth(600),
-              //         padding: const EdgeInsetsDirectional.symmetric(
-              //           vertical: 18,
-              //           horizontal: 20,
-              //         ),
-              //       ),
-              //       child: const Text(
-              //         'Trải Nghiệm Gói Vip 24h',
-              //         style: TextStyle(
-              //           fontSize: 18,
-              //           fontWeight: FontWeight.bold,
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // )
             ],
           );
         },
